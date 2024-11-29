@@ -33,7 +33,7 @@
                                                 <tr>
                                                     <th scope="row"><?= $i++; ?></th>
                                                     <td><?= esc($record->inv_no) ?></td>
-                                                    <td><?= esc($record->inv_date) ?></td>
+                                                    <td><?= date('d-m-Y', strtotime($record->inv_date)) ?></td>
                                                     <td><?= esc($record->clientname) ?></td>
                                                     <td><?= esc($record->jobname) ?></td>
                                                     <td>Omar Mrayati</td>

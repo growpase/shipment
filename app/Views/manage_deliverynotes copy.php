@@ -58,21 +58,11 @@
                                                     <td scope="row"><?= esc($deliverynote->deliverynote_id) ?></td>
                                                     <td><?= date('d-m-Y', strtotime($deliverynote->issue_date)) ?></td>
                                                     <td><?= esc($deliverynote->jobname) ?></td>
-                                                    <td><?= esc($deliverynote->est_amount) ?></td>
-                                                    <td>
-                                                        <div class="btn-group">
-                                                            <span type="button" class=""><?= esc($deliverynote->signed_status) ?></span>
-                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            </a>
-                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'YES','signed_status')">Yes</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'NO','signed_status')">No</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'OTHER','signed_status')">Other</a>
-                                                            </div>
-                                                        </div>
+                                                    <td><?= esc($deliverynote->est_amount) ?>
                                                     </td>
-
-                                                    <td>
+                                                    <td><?= esc($deliverynote->signed_status) ?> <a href="javascript:void(0)" onclick="get_data(<?= $deliverynote->id ?>,'signedin')"><i class="fa fa-edit"></i> </a> </td>
+                                                    <!-- <td><?= esc($deliverynote->is_issue_invoice) ?> <a href="javascript:void(0)" onclick="get_data(<?= $deliverynote->id ?>,'issue_invoice')"><i class="fa fa-edit"></i> </a> </td> -->
+                                                    <td class="reload">
                                                         <div class="btn-group">
                                                             <span type="button" class=""><?= esc($deliverynote->is_issue_invoice) ?></span>
                                                             <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -83,7 +73,7 @@
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td>
+                                                    <td class="reload">
                                                         <div class="btn-group">
                                                             <span type="button" class=""><?= esc($deliverynote->is_invoice_issued) ?></span>
                                                             <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -94,7 +84,7 @@
                                                             </div>
                                                         </div>
                                                     </td>
-
+                                                    <!-- <td><?= esc($deliverynote->is_invoice_issued) ?> <a href="javascript:void(0)" onclick="get_data(<?= $deliverynote->id ?>,'invoice_issue')"><i class="fa fa-edit"></i> </a> </td> -->
                                                     <td> <a href="<?= base_url() ?>deliverynotes-detail/<?= $deliverynote->id ?>"> <i class="fa fa-eye"></i> </a> | <i class="fa fa-trash-o delete-icon" onclick="delete_data(<?= $deliverynote->id ?>)"></i></td>
                                                     </td>
                                                 </tr>
@@ -113,8 +103,76 @@
     </div>
 </div>
 
+<!-- invoice issue model -->
+<div class="modal fade show" id="isInvoiceIssueModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+                </div>
+                <div class="modal-body">
+                    <form id="invoice_issueform">
+                        <input type="hidden" name="id">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="">Invoice Issue </label>
+                                    <select name="is_invoice_issued" class="form-control" id="">
+                                        <option value="">Select Option</option>
+                                        <option value="YES">Yes</option>
+                                        <option value="NO">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" onclick="updateChanges('invoice_issue')" class="btn btn-danger">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- issue invoice model -->
+<div class="modal fade show" id="isIssueInvoiceModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+                </div>
+                <div class="modal-body">
+                    <form id="issue_invoiceform">
+                        <input type="hidden" name="id">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for=""> Issued Invoice ? </label>
+                                    <select name="is_issue_invoice" class="form-control" id="">
+                                        <option value="">Select Option</option>
+                                        <option value="YES">Yes</option>
+                                        <option value="NO">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" onclick="updateChanges('issue_invoice')" class="btn btn-danger">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- signed in status model -->
-<div class="modal fade show" id="remarkModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade show" id="SignedStatus" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -123,13 +181,23 @@
                 </div>
                 <div class="modal-body">
                     <form id="signedinform">
-                        <input type="hidden" id="deliveyid" value="">
-                        <input type="hidden" id="signed_status_value" value="">
+                        <input type="hidden" name="id">
                         <div class="row">
-                            <div class="col-md-12" id="signed_remark_div">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="">Signed Delivery Notes </label>
+                                    <select name="signed_status" class="form-control" id="signed_status">
+                                        <option value="">Select Option</option>
+                                        <option value="YES">Yes</option>
+                                        <option value="NO">No</option>
+                                        <option value="OTHER">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="signed_remark_div" style="display:none">
                                 <div class="form-group">
                                     <label for="signed_remark">Signed Remark </label>
-                                    <textarea class="form-control" name="signed_remark" id="type_signed_remark" placeholder="Signed Status Remark" id=""></textarea>
+                                    <textarea class="form-control" name="signed_remark" id="signed_remark" placeholder="Signed Status Remark" id=""></textarea>
                                 </div>
                             </div>
                         </div>
@@ -137,7 +205,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" onclick="updateChanges($('#deliveyid').val(), $('#signed_status_value').val(),'signed_remark')" class="btn btn-danger">Save Changes</button>
+                    <button type="button" onclick="updateChanges('signedin')" class="btn btn-danger">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -146,6 +214,7 @@
 
 <?= $this->endSection(); ?>
 <?= $this->section('pagescripts'); ?>
+
 <script>
     let save_method = 'add';
     $(document).ready(function() {
@@ -159,72 +228,123 @@
         });
     });
 
-    // Function to reload the table content and reinitialize the DataTable
-    function reloadTableContent() {
-        // Reload the table section using jQuery .load()
-        $('.table-responsive').load(window.location.href + ' .table-responsive', function() {
-            // After the content is loaded, reinitialize DataTable to restore functionality
-            initializeDataTable();
-        });
-    }
-
-    // Initialize DataTable with the desired options
-    function initializeDataTable() {
-        // If DataTable is already initialized, destroy it before reinitializing
-        if ($.fn.dataTable.isDataTable('#dataTable2')) {
-            $('#dataTable2').DataTable().destroy();
+    $('#signed_status').change(function() {
+        var selectedName = $(this).val();
+        if (selectedName === 'OTHER') {
+            // Show the region div and make it required
+            $('#signed_remark_div').css('display', 'block');
+            $('#signed_remark').prop('required', true);
+        } else {
+            // Hide the region div and remove the required attribute
+            $('#signed_remark_div').css('display', 'none');
+            $('#signed_remark').prop('required', false);
         }
+    });
 
-        // Reinitialize DataTable
-        $('#dataTable2').DataTable({
-            "paging": true, // Enable pagination
-            "searching": true, // Enable search
-            "ordering": true, // Enable column sorting
-            "info": true, // Display info about the number of records
-            "lengthChange": true, // Enable the option to change the number of records per page
-            "responsive": false // Make the table responsive
+    function get_data(dn_id, userType) {
+        save_method = 'update';
+        var link = "<?php echo base_url() ?>edit-deliverynotes/" + dn_id;
+        // Ajax to load data from the server
+        $.ajax({
+            url: link,
+            type: "GET",
+            dataType: "JSON",
+            success: function(data) {
+                $('[name="id"]').val(data.id);
+                if (userType == 'signedin') {
+                    $('[name="signed_status"]').val(data.signed_status);
+                    if (data.signed_status == 'OTHER' || data.signed_status == 'Other') {
+                        $('#signed_remark_div').css('display', 'block');
+                        $('[name="signed_remark"]').val(data.signed_remark);
+                    } else {
+                        $('#signed_remark_div').hide();
+                    }
+                    $('#SignedStatus').modal('show');
+                    $('#SignedStatus .modal-title').text('Edit Info');
+                } else if (userType == 'issue_invoice') {
+                    $('[name="is_issue_invoice"]').val(data.is_issue_invoice);
+                    $('#isIssueInvoiceModel').modal('show');
+                    $('#isIssueInvoiceModel .modal-title').text('Edit Info');
+                } else if (userType == 'invoice_issue') {
+                    $('[name="is_invoice_issued"]').val(data.is_invoice_issued);
+                    $('#isInvoiceIssueModel').modal('show');
+                    $('#isInvoiceIssueModel .modal-title').text('Edit Info');
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
         });
     }
+
+    // function updateChanges(userType) {
+
+    //     var formData;
+    //     var url = '<?= base_url() ?>update-deliverynotes';
+
+    //     if (userType == 'signedin') {
+    //         formData = $('#signedinform').serialize();
+    //     } else if (userType == 'invoice_issue') {
+    //         formData = $('#invoice_issueform').serialize();
+    //     } else if (userType == 'issue_invoice') {
+    //         formData = $('#issue_invoiceform').serialize();
+    //     }
+
+    //     $.ajax({
+    //         url: '<?= base_url() ?>update-deliverynotes',
+    //         type: "POST",
+    //         data: formData, // Send serialized form data
+    //         dataType: "json",
+    //         success: function(response) {
+    //             if (response.status == true) {
+    //                 Swal.fire({
+    //                     position: "bottom-end",
+    //                     title: "Good job!",
+    //                     text: response.message,
+    //                     icon: "success"
+    //                 }).then((result) => {
+    //                     if (result.isConfirmed) {
+    //                         location.reload(); // Reload the page on confirmation
+    //                     }
+    //                 });
+    //             } else {
+    //                 Swal.fire({
+    //                     position: "bottom-end",
+    //                     text: response.message,
+    //                     icon: "error" // Changed to 'error' for incorrect status
+    //                 }).then((result) => {
+    //                     if (result.isConfirmed) {
+    //                         location.reload(); // Reload the page on confirmation
+    //                     }
+    //                 });
+    //             }
+    //         },
+    //         error: function(jqXHR, textStatus, errorThrown) {
+    //             console.log('AJAX request failed:', textStatus, errorThrown);
+    //         }
+    //     });
+    // }
 
     function updateChanges(id, record, coloum) {
         var url = '<?= base_url() ?>update-deliverynotes'; // The URL to send the AJAX request to
-        if (coloum == 'signed_status') {
-            if (record == 'OTHER') {
-                // Show modal to enter remark when "Other" is selected
-                $('#remarkModal').modal('show');
-                $("#deliveyid").val(id);
-                $("#signed_status_value").val(record);
-            } else {
-                // For "Yes" or "No", proceed with the update directly
-                var data = {
-                    id: id,
-                    signed_status: record
-                };
-                sendUpdateRequest(data);
-            }
-        } else {
-            var data = {
-                id: id
-            };
-            if (coloum == 'is_issue_invoice') {
-                data.is_issue_invoice = record;
-            } else if (coloum == 'is_invoice_issued') {
-                data.is_invoice_issued = record;
-            } else if (coloum == 'signed_remark') {
-                data.signed_remark = $('#type_signed_remark').val();
-                data.signed_status = record;
-                $('#remarkModal').modal('hide');
-            }
-            sendUpdateRequest(data);
-        }
-    }
 
-    function sendUpdateRequest(data) {
-        var url = '<?= base_url() ?>update-deliverynotes';
+        if (coloum == 'is_issue_invoice') {
+            var data = {
+                id: id, // Include the delivery note ID
+                is_issue_invoice: record // Send the updated status (1 or 0)
+            };
+        }
+        else if(coloum == 'is_invoice_issued'){
+            var data = {
+                id: id, // Include the delivery note ID
+                is_invoice_issued: record // Send the updated status (1 or 0)
+            };
+        }
+        // Send AJAX request to update the record
         $.ajax({
             url: url,
             type: "POST",
-            data: data,
+            data: data, // Send data directly, no form serialization
             dataType: "json",
             success: function(response) {
                 if (response.status == true) {
@@ -240,19 +360,20 @@
                     Swal.fire({
                         position: "bottom-end",
                         text: response.message,
-                        icon: "error"
+                        icon: "error" // Show error if the update fails
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            reloadTableContent();
+                            location.reload(); // Reload the page on confirmation
                         }
                     });
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                console.log('AJAX request failed:', textStatus, errorThrown);
+                console.log('AJAX request failed:', textStatus, errorThrown); // Log any errors
             }
         });
     }
+
 
     function delete_data(id) {
         Swal.fire({

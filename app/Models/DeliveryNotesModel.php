@@ -125,4 +125,14 @@ class DeliveryNotesModel extends Model
             ->get()
             ->getRow();
     }
+
+    
+    public function getDeliveryNoteByJobId($jobID)
+    {
+        return $this->select('tbl_deliverynotes.*, tbl_jobsheet.jobname,tbl_jobsheet.clientname,tbl_jobsheet.manualreff')
+            ->join('tbl_jobsheet', 'tbl_deliverynotes.job_id = tbl_jobsheet.jobid', 'left', false) // Ensure the table name matches your database
+            ->where('tbl_deliverynotes.job_id', $jobID)
+            ->orderBy('tbl_deliverynotes.id', 'DESC')
+            ->get()->getResult();
+    }
 }

@@ -10,7 +10,7 @@ $routes->get('/', 'Home::login');
 $routes->get('user', 'Home::user',['filter' => 'sessionCheck']);
 $routes->get('/dashboard', 'Home::dashboard',['filter' => 'sessionCheck']);
 $routes->get('job-sheet', 'Home::JobSheet',['filter' => 'sessionCheck']);
-$routes->get('delivery-notes', 'Home::DeliveryNotes',['filter' => 'sessionCheck']);
+$routes->get('delivery-notes/(:num)', 'Home::DeliveryNotesByJobId/$1',['filter' => 'sessionCheck']);
 $routes->get('manage-delivery-notes', 'Home::ManageDeliveryNotes',['filter' => 'sessionCheck']);
 $routes->get('invoices', 'Home::Invoices',['filter' => 'sessionCheck']);
 $routes->get('jobsheet-detail','Home::jobsheet_detail',['filter' => 'sessionCheck']);
@@ -44,6 +44,8 @@ $routes->post('update-deliverynotes','DeliveryNotes::updateDelivery');
 $routes->get('deliverynotes-detail/(:num)','Home::deliverynotes_detail/$1',['filter' => 'sessionCheck']);
 $routes->post('import-deliverynotes','DeliveryNotes::importFile');
 $routes->get('delete-deliverynote/(:num)','DeliveryNotes::deleteRow/$1');
+$routes->post('insert-deliverynote','DeliveryNotes::insertDeliveryNote');
+
 
 // invoices....
 $routes->post('import-invoices','Invoices::importFile');

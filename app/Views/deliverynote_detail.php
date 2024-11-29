@@ -180,7 +180,6 @@
                     $('.buttongrp').css('display', 'block');
                 }
             });
-
         });
 
         // Check the current delivery status on page load and adjust the input field accordingly

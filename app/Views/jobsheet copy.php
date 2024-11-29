@@ -48,47 +48,10 @@
                                                     <td><?= esc($record->project_cost) ?></td>
                                                     <td><?= esc($record->invoice_amount) ?></td>
                                                     <td><?= esc($record->balance_amount) ?></td>
-                                                    <!-- <td><?= esc($record->dispatcher_name) ?> <a href="javascript:void(0)" onclick="assigned_user(<?= $record->id ?>,'dispatcher')"> <i class="fa fa-edit"></i> </a> </td> -->
-                                                    <!-- <td><?= esc($record->status) ?> <a href="javascript:void(0)" onclick="assigned_user(<?= $record->id ?>,'jobstatus')"> <i class="fa fa-edit"></i> </a> </td> -->
-                                                    <td>
-                                                        <div class="btn-group">
-                                                            <span type="button" class=""><?= esc($record->dispatcher_name) ?></span>
-                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            </a>
-                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <?php foreach ($dispatcherlist as $dispatcher) { ?>
-                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,<?= $dispatcher->ID ?>,'dispatcher_id')"><?= $dispatcher->name ?></a>
-                                                                <?php } ?>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-
-                                                    <td>
-                                                        <div class="btn-group">
-                                                            <span type="button" class=""><?= esc($record->handler_name) ?></span>
-                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            </a>
-                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <?php foreach ($handlerlist as $handler) { ?>
-                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,<?= $handler->ID ?>,'handler_id')"><?= $handler->name ?></a>
-                                                                <?php } ?>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-
-                                                    <td>
-                                                        <div class="btn-group">
-                                                            <span type="button" class=""><?= esc($record->status) ?></span>
-                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            </a>
-                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,'Approved','status')">Approved</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,'To Be Approved','status')">To Be Approved</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,'Rejected','status')">Rejected</a>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="text-center"><a href="<?= base_url() ?>delivery-notes/<?= esc($record->jobid) ?>"><i class="ti-shopping-cart-full" title="Upload Delivery Notes"></i></a></td>
+                                                    <td> <?= esc($record->dispatcher_name) ?> <a href="javascript:void(0)" onclick="assigned_user(<?= $record->id ?>,'dispatcher')"> <i class="fa fa-edit"></i> </a> </td>
+                                                    <td> <?= esc($record->handler_name) ?> <a href="javascript:void(0)" onclick="assigned_user(<?= $record->id ?>,'handler')"> <i class="fa fa-edit"></i> </a> </td>
+                                                    <td> <?= esc($record->status) ?> <a href="javascript:void(0)" onclick="assigned_user(<?= $record->id ?>,'jobstatus')"> <i class="fa fa-edit"></i> </a> </td>
+                                                    <td class="text-center"><a href="<?= base_url() ?>delivery-notes"><i class="ti-shopping-cart-full" title="Upload Delivery Notes"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>
                                         </tbody>
@@ -392,149 +355,73 @@
 
     });
 
-    // function assigned_user(jobid, userType) {
-    //     save_method = 'update';
-    //     var link = "<?php echo base_url() ?>edit-jobsheet/" + jobid;
-    //     // Ajax to load data from the server
-    //     $.ajax({
-    //         url: link,
-    //         type: "GET",
-    //         dataType: "JSON",
-    //         success: function(data) {
+    function assigned_user(jobid, userType) {
+        save_method = 'update';
+        var link = "<?php echo base_url() ?>edit-jobsheet/" + jobid;
+        // Ajax to load data from the server
+        $.ajax({
+            url: link,
+            type: "GET",
+            dataType: "JSON",
+            success: function(data) {
 
-    //             $('[name="id"]').val(data.id);
-    //             if (userType == 'dispatcher') {
-    //                 $('[name="dispatcher_id"]').val(data.dispatcher_id);
-    //                 $('#assignDispatcherModal').modal('show');
-    //                 $('#assignDispatcherModal .modal-title').text('Edit Dispatcher Info');
-    //             } else if (userType == 'handler') {
-    //                 $('[name="handler_id"]').val(data.handler_id);
-    //                 $('#assignHandlerModal').modal('show');
-    //                 $('#assignHandlerModal .modal-title').text('Edit Handler Info');
-    //             } else if (userType == 'jobstatus') {
-    //                 $('[name="status"]').val(data.status);
-    //                 $('#jobstatusModal').modal('show');
-    //                 $('#jobstatusModal .modal-title').text('Edit Status');
-    //             }
-    //         },
-    //         error: function(jqXHR, textStatus, errorThrown) {
-    //             alert(errorThrown);
-    //         }
-    //     });
-    // }
-
-    // function updateChanges(userType) {
-    //     var formData;
-    //     var url = '<?= base_url() ?>update-jobsheet';
-    //     if (userType == 'dispatcher') {
-    //         formData = $('#dispatcherForm').serialize();
-    //     } else if (userType == 'handler') {
-    //         formData = $('#handlerForm').serialize();
-    //     } else if (userType == 'jobstatus') {
-    //         formData = $('#statusForm').serialize();
-    //     }
-
-    //     $.ajax({
-    //         url: url,
-    //         type: "POST",
-    //         data: formData, // Send serialized form data
-    //         dataType: "json",
-    //         success: function(response) {
-    //             if (response.status == true) {
-    //                 Swal.fire({
-    //                     position: "bottom-end",
-    //                     title: "Good job!",
-    //                     text: response.message,
-    //                     icon: "success"
-    //                 }).then((result) => {
-    //                     if (result.isConfirmed) {
-    //                         location.reload(); // Reload the page on confirmation
-    //                     }
-    //                 });
-    //             } else {
-    //                 Swal.fire({
-    //                     position: "bottom-end",
-    //                     text: response.message,
-    //                     icon: "error" // Changed to 'error' for incorrect status
-    //                 }).then((result) => {
-    //                     if (result.isConfirmed) {
-    //                         location.reload(); // Reload the page on confirmation
-    //                     }
-    //                 });
-    //             }
-    //         },
-    //         error: function(jqXHR, textStatus, errorThrown) {
-    //             console.log('AJAX request failed:', textStatus, errorThrown);
-    //         }
-    //     });
-    // }
-
-    // Function to reload the table content and reinitialize the DataTable
-    function reloadTableContent() {
-        // Reload the table section using jQuery .load()
-        $('.table-responsive').load(window.location.href + ' .table-responsive', function() {
-            // After the content is loaded, reinitialize DataTable to restore functionality
-            initializeDataTable();
+                $('[name="id"]').val(data.id);
+                if (userType == 'dispatcher') {
+                    $('[name="dispatcher_id"]').val(data.dispatcher_id);
+                    $('#assignDispatcherModal').modal('show');
+                    $('#assignDispatcherModal .modal-title').text('Edit Dispatcher Info');
+                } else if (userType == 'handler') {
+                    $('[name="handler_id"]').val(data.handler_id);
+                    $('#assignHandlerModal').modal('show');
+                    $('#assignHandlerModal .modal-title').text('Edit Handler Info');
+                } else if (userType == 'jobstatus') {
+                    $('[name="status"]').val(data.status);
+                    $('#jobstatusModal').modal('show');
+                    $('#jobstatusModal .modal-title').text('Edit Status');
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
         });
     }
 
-    // Initialize DataTable with the desired options
-    function initializeDataTable() {
-        // If DataTable is already initialized, destroy it before reinitializing
-        if ($.fn.dataTable.isDataTable('#dataTable2')) {
-            $('#dataTable2').DataTable().destroy();
-        }
-
-        // Reinitialize DataTable
-        $('#dataTable2').DataTable({
-            "paging": true, // Enable pagination
-            "searching": true, // Enable search
-            "ordering": true, // Enable column sorting
-            "info": true, // Display info about the number of records
-            "lengthChange": true, // Enable the option to change the number of records per page
-            "responsive": false // Make the table responsive
-        });
-    }
-
-    function updateChanges(id, record, coloum) {
-        var data = {
-            id: id
-        };
-        if (coloum == 'status') {
-            data.status = record;
-        } else if (coloum == 'dispatcher_id') {
-            data.dispatcher_id = record;
-        } else if (coloum == 'handler_id') {
-            data.handler_id = record;
-        }
-        sendUpdateRequest(data);
-    }
-
-    function sendUpdateRequest(data) {
+    function updateChanges(userType) {
+        var formData;
         var url = '<?= base_url() ?>update-jobsheet';
+        if (userType == 'dispatcher') {
+            formData = $('#dispatcherForm').serialize();
+        } else if (userType == 'handler') {
+            formData = $('#handlerForm').serialize();
+        } else if (userType == 'jobstatus') {
+            formData = $('#statusForm').serialize();
+        }
+
         $.ajax({
             url: url,
             type: "POST",
-            data: data,
+            data: formData, // Send serialized form data
             dataType: "json",
             success: function(response) {
                 if (response.status == true) {
                     Swal.fire({
+                        position: "bottom-end",
+                        title: "Good job!",
                         text: response.message,
                         icon: "success"
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            reloadTableContent();
+                            location.reload(); // Reload the page on confirmation
                         }
                     });
                 } else {
                     Swal.fire({
                         position: "bottom-end",
                         text: response.message,
-                        icon: "error"
+                        icon: "error" // Changed to 'error' for incorrect status
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            reloadTableContent();
+                            location.reload(); // Reload the page on confirmation
                         }
                     });
                 }
@@ -544,10 +431,6 @@
             }
         });
     }
-
-
-
-
 
     function saveRecord() {
         var formData = $('#jobform').serialize();

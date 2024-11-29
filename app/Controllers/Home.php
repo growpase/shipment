@@ -87,10 +87,14 @@ class Home extends BaseController
         return view('deliverynote_detail',$data);
     }
 
-    public function DeliveryNotes()
+    public function DeliveryNotesByJobId($jobid)
     { 
-        $data['pageTitle'] = 'Manage Delivery Notes';
-        return view('deliverynotes',$data);
+        $data['pageTitle'] = 'Delivery Note Under Job';
+        $data['handlerlist'] = $this->UserModel->where('user_role', 2)->get()->getResult();
+        $data['jobdetails'] = $this->JobsheetModel->where('jobid',$jobid)->get()->getRow();
+        $data['deliverynotes'] = $this->DeliveryNotesModel->getDeliveryNoteByJobId($jobid);
+        // echo "<pre>";print_r($data);exit;
+        return view('deliverynotesbyjobid',$data);
     }
 
     public function ManageDeliveryNotes()

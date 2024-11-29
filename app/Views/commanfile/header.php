@@ -16,19 +16,16 @@
     <!-- amchart css -->
     <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
     <!-- others css -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.jqueryui.min.css">
+    <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/css/responsive.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/css/responsive.jqueryui.min.css">
 
 
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/typography.css">
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/default-css.css">
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/styles.css">
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/responsive.css">
-    
-
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -327,14 +324,11 @@
     <script src="<?= base_url() ?>assets/js/jquery.slimscroll.min.js"></script>
     <script src="<?= base_url() ?>assets/js/jquery.slicknav.min.js"></script>
 
-
-    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
-    <script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
-
-
+    <script src="<?= base_url() ?>assets/js/jquery.dataTables.js"></script>
+    <script src="<?= base_url() ?>assets/js/jquery.dataTables.min.js"></script>
+    <script src="<?= base_url() ?>assets/js/dataTables.bootstrap4.min.js"></script>
+    <script src="<?= base_url() ?>assets/js/dataTables.responsive.min.js"></script>
+    <script src="<?= base_url() ?>assets/js/responsive.bootstrap.min.js"></script>
 
     <!-- start chart js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
@@ -349,8 +343,6 @@
     <script src="https://www.amcharts.com/lib/3/serial.js"></script>
     <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
     <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
-
-
 
     <!-- all line chart activation -->
     <script src="<?= base_url() ?>assets/js/line-chart.js"></script>
@@ -374,6 +366,8 @@
             // Clear all validation error messages
             $(this).find('.text-danger').text('');
         });
+
+       
     </script>
 
     <?= $this->renderSection('pagescripts'); ?>

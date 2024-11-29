@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Models\DeliveryNotesModel;
-
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx as excel;
 
@@ -57,6 +56,7 @@ class DeliveryNotes extends BaseController
             } else {
                 $reader = new excel();
             }
+            
             $spreadsheet = $reader->load($tempName);
             $sheetData = $spreadsheet->getActiveSheet()->toArray();
 
@@ -112,6 +112,60 @@ class DeliveryNotes extends BaseController
         }
     }
 
+    public function insertDeliveryNote()
+    {
+        $validationRules = [
+            'deliverynote_id'=> ['label' => 'Delivery Note Id', 'rules' => 'required'],
+            'region' => ['label' => 'Region', 'rules' => 'required'],
+            'issue_date'     => ['label' => 'Issue Date', 'rules' => 'required'],
+            'est_amount'        => ['label' => 'Estimate Amount', 'rules' => 'required'],
+            'handler_id'     => ['label' => 'Handler ID', 'rules' => 'required'],
+        ];
+
+        $validationMessages = [
+            'deliverynote_id' => [
+                'required' => 'Please Mentioned DeliveryNoteId',
+            ],
+            'region' => [
+                'required' => 'Please Select Region',
+            ],
+            'issue_date' => [
+                'required' => 'Please Select Issue Date',
+            ],
+            'est_amount' => [
+                'required' => 'Enter Amount.',
+            ],
+            'handler_id' => [
+                'required' => 'Assign Handler.',
+            ],
+        ];
+
+        $this->validation->setRules($validationRules, $validationMessages);
+
+        // Validate form data
+        if (!$this->validation->withRequest($this->request)->run()) {
+            // If validation fails, return the error messages as JSON
+            $errors = $this->validation->getErrors();
+            return $this->response->setJSON([
+                'status' => false,
+                'errors' => $errors
+            ]);
+        } else {
+
+            $_POST['created_by'] =  $this->session->get('userId');;
+            $_POST['created_date'] = date('Y-m-d');
+            
+            $isInsert = $this->DeliveryNotesModel->insert($_POST);
+            if ($isInsert > 0) {
+                return $this->response->setJSON(['status' => true, 'message' => 'Job Inserted Successfully']);
+            } else {
+                return $this->response->setJSON(['status' => false, 'message' => 'Something Went Wrong']);
+            }
+        }
+    }
+
+
+
     public function editRow($id)
     {
         $data = $this->DeliveryNotesModel->find($id);
@@ -128,8 +182,8 @@ class DeliveryNotes extends BaseController
     {
         $_POST['updated_by'] =  $this->session->get('userId');;
         $_POST['updated_date'] = date('Y-m-d');
+      
         $update = $this->DeliveryNotesModel->save($_POST);
-     
         if ($update > 0) {
             return $this->response->setJSON(['status' => true, 'message' => 'Update Successfully']);
         } else {
