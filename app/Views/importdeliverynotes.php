@@ -7,7 +7,7 @@
             <div class="login-box">
                 <form method="POST" id="deliverynotesform" enctype="multipart/form-data">
                     <div class="login-form-body" style="border: 3px solid #000;">
-                       
+
                         <div class="form-group">
                             <label for="import_file">Upload File Here</label>
                             <input type="file" name="import_file" id="import_file">
@@ -31,7 +31,6 @@
 
 <?= $this->section('pagescripts'); ?>
 <script>
-
     $(document).ready(function() {
         // For input fields
         $("input").on("change", function() {
@@ -44,7 +43,7 @@
     })
 
     function submitform() {
-
+        $('#loader-overlay').fadeIn();
         var formData = new FormData($('#deliverynotesform')[0]);
         $.ajax({
             url: '<?= base_url() ?>import-deliverynotes', // Your backend URL
@@ -53,7 +52,7 @@
             contentType: false, // Don't set content type header
             processData: false, // Don't process data
             success: function(response) {
-                
+                $('#loader-overlay').fadeOut();
                 // Enable the submit button again
                 $('#form_submit').prop('disabled', false);
                 if (response.errors) {
@@ -87,12 +86,12 @@
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 // Handle any server-side errors
+                $('#loader-overlay').fadeOut();
                 $('#form_submit').prop('disabled', false);
                 $('#form_submit').text('Upload File <i class="ti-upload"></i>');
                 $('#error-messages').html('<div class="alert alert-danger">There was an error with the upload. Please try again.</div>');
             }
         });
     }
-    
 </script>
 <?= $this->endSection(); ?>

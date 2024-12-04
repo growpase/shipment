@@ -58,33 +58,35 @@ class DeliveryNotes extends BaseController
             }
             $spreadsheet = $reader->load($tempName);
             $sheetData = $spreadsheet->getActiveSheet()->toArray();
-
+           
             if (!empty($sheetData)) {
-
-                // Define headers
-                $headers = $sheetData[0]; // First row is the headers
-                $headerPositions = [
-                    'deliverynote_id' => array_search('delivery number', $headers),
-                    'issue_date' => array_search('date', $headers),
-                    'warehouse' => array_search('warehouse', $headers),
-                    'job_id' => array_search('job #', $headers),
-                ];
-
-                if (in_array(false, $headerPositions, true)) {
-                    return $this->response->setJSON([
-                        'status' => false,
-                        'message' => 'Error: Missing required columns in the file.',
-                    ]);
-                }
-
                 for ($i = 1; $i < count($sheetData); $i++) {
+
+                    $job_id = !empty($sheetData[$i][8]) ? $sheetData[$i][8] : '0';
+                    $deliverynote_id = !empty($sheetData[$i][0]) ? $sheetData[$i][0] : '0';
+
+                    $issue_date = !empty($sheetData[$i][1])
+                        ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][1])))
+                        : '0000-00-00';
+
+                    $warehouse = !empty($sheetData[$i][5]) ? $sheetData[$i][5] : '0';
+
+                    // $signed_status = !empty($sheetData[$i][4]) ? $sheetData[$i][4] : '0';
+                    // $signed_remark = !empty($sheetData[$i][5]) ? $sheetData[$i][5] : '0';
+                    // $delivery_status = !empty($sheetData[$i][6]) ? $sheetData[$i][6] : '0';
+                    // $delivery_status_remark = !empty($sheetData[$i][7]) ? $sheetData[$i][7] : '0';
+                    // $transport = !empty($sheetData[$i][11]) ? $sheetData[$i][11] : '0';
+                    // $is_issue_invoice = !empty($sheetData[$i][8]) ? $sheetData[$i][8] : '0';
+                    // $is_invoice_issued = !empty($sheetData[$i][9]) ? $sheetData[$i][9] : '0';
+                    // $est_amount = !empty($sheetData[$i][10]) ? $sheetData[$i][10] : '0';
+
                     $data = [
-                        'deliverynote_id' => $sheetData[$i][$headerPositions['deliverynote_id']] ?? null,
-                        'issue_date' => isset($sheetData[$i][$headerPositions['issue_date']]) ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][$headerPositions['issue_date']]))) : null,
-                        'warehouse' => $sheetData[$i][$headerPositions['warehouse']] ?? null,
-                        'job_id' => $sheetData[$i][$headerPositions['job_id']] ?? null,
+                        'job_id' => $job_id,
+                        'deliverynote_id' => $deliverynote_id,
+                        'issue_date' => $issue_date,
+                        'warehouse' => $warehouse,
                         'created_by' => $this->session->get('userId'),
-                        'create_date' => date('Y-m-d'),
+                        'created_date' => date('Y-m-d')
                     ];
                     $this->DeliveryNotesModel->insert($data);
                 }
@@ -104,7 +106,7 @@ class DeliveryNotes extends BaseController
     public function insertDeliveryNote()
     {
         $validationRules = [
-            'deliverynote_id' => ['label' => 'Delivery Note Id', 'rules' => 'required'],
+            'deliverynote_id'=> ['label' => 'Delivery Note Id', 'rules' => 'required'],
             'region' => ['label' => 'Region', 'rules' => 'required'],
             'issue_date'     => ['label' => 'Issue Date', 'rules' => 'required'],
             'est_amount'        => ['label' => 'Estimate Amount', 'rules' => 'required'],
@@ -143,7 +145,7 @@ class DeliveryNotes extends BaseController
 
             $_POST['created_by'] =  $this->session->get('userId');;
             $_POST['created_date'] = date('Y-m-d');
-
+            
             $isInsert = $this->DeliveryNotesModel->insert($_POST);
             if ($isInsert > 0) {
                 return $this->response->setJSON(['status' => true, 'message' => 'Job Inserted Successfully']);
@@ -152,6 +154,8 @@ class DeliveryNotes extends BaseController
             }
         }
     }
+
+
 
     public function editRow($id)
     {
@@ -169,7 +173,7 @@ class DeliveryNotes extends BaseController
     {
         $_POST['updated_by'] =  $this->session->get('userId');;
         $_POST['updated_date'] = date('Y-m-d');
-
+      
         $update = $this->DeliveryNotesModel->save($_POST);
         if ($update > 0) {
             return $this->response->setJSON(['status' => true, 'message' => 'Update Successfully']);
@@ -177,40 +181,6 @@ class DeliveryNotes extends BaseController
             // Log error when update fails
             return $this->response->setJSON(['status' => false, 'message' => 'Something Went Wrong']);
         }
-    }
 
-    public function stuff()
-    {
-
-        // for ($i = 1; $i < count($sheetData); $i++) {
-
-        //     $job_id = !empty($sheetData[$i][8]) ? $sheetData[$i][8] : '0';
-        //     $deliverynote_id = !empty($sheetData[$i][0]) ? $sheetData[$i][0] : '0';
-
-        //     $issue_date = !empty($sheetData[$i][1])
-        //         ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][1])))
-        //         : '0000-00-00';
-
-        //     $warehouse = !empty($sheetData[$i][5]) ? $sheetData[$i][5] : '0';
-
-        //     $data = [
-        //         'job_id' => $job_id,
-        //         'deliverynote_id' => $deliverynote_id,
-        //         'issue_date' => $issue_date,
-        //         'warehouse' => $warehouse,
-        //         'created_by' => $this->session->get('userId'),
-        //         'created_date' => date('Y-m-d')
-        //     ];
-        //     $this->DeliveryNotesModel->insert($data);
-        // }
-
-        // $data = [
-        //     'job_id' => $job_id,
-        //     'deliverynote_id' => $deliverynote_id,
-        //     'issue_date' => $issue_date,
-        //     'warehouse' => $warehouse,
-        //     'created_by' => $this->session->get('userId'),
-        //     'created_date' => date('Y-m-d')
-        // ];
     }
 }

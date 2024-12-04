@@ -13,6 +13,7 @@ class DeliveryNotesModel extends Model
         'job_id',
         'handler_id',
         'region',
+        'warehouse',
         'deliverynote_id',
         'issue_date',
         'signed_status',

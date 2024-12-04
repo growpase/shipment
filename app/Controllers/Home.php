@@ -101,7 +101,6 @@ class Home extends BaseController
     { 
         $data['pageTitle'] = 'Manage Delivery Notes';
         $data['deliverynotes'] = $this->DeliveryNotesModel->getDeliveryNoteList();
-        
         return view('manage_deliverynotes',$data);
     }
 

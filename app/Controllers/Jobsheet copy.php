@@ -70,57 +70,56 @@ class Jobsheet extends BaseController
             }
             $spreadsheet = $reader->load($tempName);
             $sheetData = $spreadsheet->getActiveSheet()->toArray();
+            
+            echo "<pre>";print_r($sheetData);exit;
 
             if (!empty($sheetData)) {
-                $headers = $sheetData[0]; // First row is considered as headers
-                $headerPositions = [
-                    'jobid' => array_search('JOB#', $headers),
-                    'jobname' => array_search('PROJECT NAME', $headers),
-                    'job_createdate' => array_search('DATE CREATION', $headers),
-                    'manualreff' => array_search('MANUAL REF#', $headers),
-                    'jobtype' => array_search('JOB TYPE', $headers),
-                    'clientname' => array_search('CLIENT NAME', $headers),
-                    'handler_id' => array_search('HANDLER', $headers),
-                    'status' => array_search('STATUS', $headers),
-                    'stat' => array_search('STAT', $headers),
-                    'currency' => array_search('CURRENCY', $headers),
-                    'project_cost' => array_search('PROJECT VALUE', $headers),
-                    'invoice_amount' => array_search('TOTAL INV ISSUED AMOUNT', $headers),
-                    'balance_amount' => array_search('BALANCE', $headers),
-                ];
-
-                if (in_array(false, $headerPositions, true)) {
-                    return $this->response->setJSON([
-                        'status' => false,
-                        'message' => 'Error: Missing required columns in the file.',
-                    ]);
-                }
-
                 for ($i = 1; $i < count($sheetData); $i++) {
-                    if ($sheetData[$i][$headerPositions['handler_id']]) {
-                        $handlerid = $this->UserModel->getByHandlerName($sheetData[$i][$headerPositions['handler_id']]);
-                        $handler_id = !empty($handlerid) ? $handlerid->ID : '0';
-                    }
+
+                    $user_name = !empty($sheetData[$i][7]) ? $sheetData[$i][7] : '0'; 
                     // apply handler ID from sheet via name....
+                    $handlerid = $this->UserModel->getByHandlerName($user_name);
+
+                    $handler_id = !empty($handlerid) ? $handlerid->ID : '0';
+                    $branch = $_POST['branch'];
+                    $jobid = !empty($sheetData[$i][2]) ? $sheetData[$i][0] : '0';
+                    $jobname = !empty($sheetData[$i][2]) ? $sheetData[$i][2] : '0';
+
+                    $job_createdate = !empty($sheetData[$i][3])
+                        ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][3])))
+                        : '0000-00-00';
+
+                    $manualreff = !empty($sheetData[$i][4]) ? $sheetData[$i][4] : '0';
+                    $jobtype = !empty($sheetData[$i][5]) ? $sheetData[$i][5] : '0';
+                    $clientname = !empty($sheetData[$i][6]) ? $sheetData[$i][6] : '0';
+                    $stat = !empty($sheetData[$i][18]) ? $sheetData[$i][18] : '0';
+                    $currency = !empty($sheetData[$i][19]) ? $sheetData[$i][19] : '0';
+                    $status = !empty($sheetData[$i][13]) ? $sheetData[$i][13] : '0';
+                    $project_cost = !empty($sheetData[$i][22]) ? floatval(str_replace(',', '', $sheetData[$i][22])) : 0;
+                    $invoice_amount = !empty($sheetData[$i][22]) ? floatval(str_replace(',', '', $sheetData[$i][23])) : 0;
+                    $balance_amount = !empty($sheetData[$i][24]) ? floatval(str_replace(',', '', $sheetData[$i][24])) : 0;
+                    
                     $data = [
-                        'branch' => $_POST['branch'] ?? null,
-                        'jobid' => $sheetData[$i][$headerPositions['jobid']] ?? null,
-                        'jobname' => $sheetData[$i][$headerPositions['jobname']] ?? null,
-                        'job_createdate' => isset($sheetData[$i][$headerPositions['job_createdate']]) ? date('Y-m-d', strtotime($sheetData[$i][$headerPositions['job_createdate']])) : null,
-                        'manualreff' => $sheetData[$i][$headerPositions['manualreff']] ?? null,
-                        'jobtype' => $sheetData[$i][$headerPositions['jobtype']] ?? null,
-                        'clientname' => $sheetData[$i][$headerPositions['clientname']] ?? null,
+                        'branch' => $branch,
+                        'jobid' => $jobid,
+                        'jobname' => $jobname,
+                        'job_createdate' => $job_createdate,
+                        'manualreff' => $manualreff,
+                        'jobtype' => $jobtype,
+                        'clientname' => $clientname,
+                        'stat' => $stat,
+                        'currency' => $currency,
                         'handler_id' => $handler_id,
-                        'status' => $sheetData[$i][$headerPositions['status']] ?? null,
-                        'stat' => $sheetData[$i][$headerPositions['stat']] ?? null,
-                        'currency' => $sheetData[$i][$headerPositions['currency']] ?? null,
-                        'project_cost' => floatval($sheetData[$i][$headerPositions['project_cost']]) ?? 0,
-                        'invoice_amount' => floatval($sheetData[$i][$headerPositions['invoice_amount']]) ?? 0,
-                        'balance_amount' => floatval($sheetData[$i][$headerPositions['balance_amount']]) ?? 0,
+                        'status' => $status,
+                        'project_cost' => $project_cost,
+                        'invoice_amount' => $invoice_amount,
+                        'balance_amount' => $balance_amount,
                         'created_by' => $this->session->get('userId'),
-                        'create_date' => date('Y-m-d'),
+                        'create_date' => date('Y-m-d')
                     ];
+                    
                     $this->JobsheetModel->insert($data);
+                   
                 }
                 return $this->response->setJSON([
                     'status' => true,
@@ -259,52 +258,5 @@ class Jobsheet extends BaseController
         } else {
             return $this->response->setJSON(['status' => false, 'message' => 'Something Went Wrong']);
         }
-    }
-
-    public function stuff()
-    {
-        //     $user_name = !empty($sheetData[$i][7]) ? $sheetData[$i][7] : '0'; 
-        //     // apply handler ID from sheet via name....
-        //     $handlerid = $this->UserModel->getByHandlerName($user_name);
-
-        //     $handler_id = !empty($handlerid) ? $handlerid->ID : '0';
-        //     $branch = $_POST['branch'];
-        //     $jobid = !empty($sheetData[$i][2]) ? $sheetData[$i][0] : '0';
-        //     $jobname = !empty($sheetData[$i][2]) ? $sheetData[$i][2] : '0';
-
-        //     $job_createdate = !empty($sheetData[$i][3])
-        //         ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][3])))
-        //         : '0000-00-00';
-
-        //     $manualreff = !empty($sheetData[$i][4]) ? $sheetData[$i][4] : '0';
-        //     $jobtype = !empty($sheetData[$i][5]) ? $sheetData[$i][5] : '0';
-        //     $clientname = !empty($sheetData[$i][6]) ? $sheetData[$i][6] : '0';
-        //     $stat = !empty($sheetData[$i][18]) ? $sheetData[$i][18] : '0';
-        //     $currency = !empty($sheetData[$i][19]) ? $sheetData[$i][19] : '0';
-        //     $status = !empty($sheetData[$i][13]) ? $sheetData[$i][13] : '0';
-        //     $project_cost = !empty($sheetData[$i][22]) ? floatval(str_replace(',', '', $sheetData[$i][22])) : 0;
-        //     $invoice_amount = !empty($sheetData[$i][22]) ? floatval(str_replace(',', '', $sheetData[$i][23])) : 0;
-        //     $balance_amount = !empty($sheetData[$i][24]) ? floatval(str_replace(',', '', $sheetData[$i][24])) : 0;
-
-        //     $data = [
-        //         'branch' => $branch,
-        //         'jobid' => $jobid,
-        //         'jobname' => $jobname,
-        //         'job_createdate' => $job_createdate,
-        //         'manualreff' => $manualreff,
-        //         'jobtype' => $jobtype,
-        //         'clientname' => $clientname,
-        //         'stat' => $stat,
-        //         'currency' => $currency,
-        //         'handler_id' => $handler_id,
-        //         'status' => $status,
-        //         'project_cost' => $project_cost,
-        //         'invoice_amount' => $invoice_amount,
-        //         'balance_amount' => $balance_amount,
-        //         'created_by' => $this->session->get('userId'),
-        //         'create_date' => date('Y-m-d')
-        //     ];
-
-        //     $this->JobsheetModel->insert($data);
     }
 }

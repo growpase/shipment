@@ -32,7 +32,7 @@ class InvoiceModel extends Model
     public function getInvoiceList()
     {
         return $this->select('tbl_invoices.*, tbl_jobsheet.jobname,tbl_jobsheet.clientname')
-            ->join('tbl_jobsheet', 'tbl_invoices.job_id = tbl_jobsheet.id','left') // Ensure the table name matches your database
+            ->join('tbl_jobsheet', 'tbl_invoices.job_id = tbl_jobsheet.jobid','left') // Ensure the table name matches your database
             ->orderBy('tbl_invoices.id', 'DESC')
             ->get()->getResult();
     }

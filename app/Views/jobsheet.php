@@ -27,8 +27,9 @@
                                                 <th>Job Type</th>
                                                 <th>Client Name</th>
                                                 <th>Manual Reff</th>
+                                                <th>Realize Cost</th>
                                                 <th>Project Cost</th>
-                                                <th>Invoice Amount</th>
+                                                <th>Inv.Amount</th>
                                                 <th>Balance Amount</th>
                                                 <th>Dispatcher</th>
                                                 <th>Handler</th>
@@ -37,7 +38,22 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($Jobrecords as $record): ?>
+                                            <?php
+
+                                            function formatNumber($number)
+                                            {
+                                                if ($number == 0) {
+                                                    return '0.00';
+                                                }
+                                                $exploded = explode('.', $number);
+                                                $integerPart = $exploded[0];
+                                                $decimalPart = isset($exploded[1]) ? $exploded[1] : '00';
+                                                // Format the integer part
+                                                $formattedIntegerPart = preg_replace('/\B(?=(\d{2})+(?!\d))/', ',', substr($integerPart, 0, -3)) . ',' . substr($integerPart, -3);
+                                                return $formattedIntegerPart . '.' . str_pad($decimalPart, 2, '0', STR_PAD_RIGHT);
+                                            }
+
+                                            foreach ($Jobrecords as $record): ?>
                                                 <tr>
                                                     <th scope="row"><?= esc($record->jobid) ?></th>
                                                     <td><?= date('d-m-Y', strtotime($record->job_createdate)) ?></td>
@@ -45,11 +61,10 @@
                                                     <td><?= esc($record->jobtype) ?></td>
                                                     <td><?= esc($record->clientname) ?></td>
                                                     <td><?= esc($record->manualreff) ?></td>
-                                                    <td><?= esc($record->project_cost) ?></td>
-                                                    <td><?= esc($record->invoice_amount) ?></td>
-                                                    <td><?= esc($record->balance_amount) ?></td>
-                                                    <!-- <td><?= esc($record->dispatcher_name) ?> <a href="javascript:void(0)" onclick="assigned_user(<?= $record->id ?>,'dispatcher')"> <i class="fa fa-edit"></i> </a> </td> -->
-                                                    <!-- <td><?= esc($record->status) ?> <a href="javascript:void(0)" onclick="assigned_user(<?= $record->id ?>,'jobstatus')"> <i class="fa fa-edit"></i> </a> </td> -->
+                                                    <td><?= esc(formatNumber($record->realize_cost)) ?></td>
+                                                    <td><?= esc(formatNumber($record->project_cost)) ?></td>
+                                                    <td><?= esc(formatNumber($record->invoice_amount)) ?></td>
+                                                    <td><?= esc(formatNumber($record->balance_amount)) ?></td>
                                                     <td>
                                                         <div class="btn-group">
                                                             <span type="button" class=""><?= esc($record->dispatcher_name) ?></span>
@@ -62,7 +77,6 @@
                                                             </div>
                                                         </div>
                                                     </td>
-
                                                     <td>
                                                         <div class="btn-group">
                                                             <span type="button" class=""><?= esc($record->handler_name) ?></span>
@@ -84,6 +98,7 @@
                                                             <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
                                                                 <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,'Approved','status')">Approved</a>
                                                                 <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,'To Be Approved','status')">To Be Approved</a>
+                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,'Job to Close','status')">Job to Close</a>
                                                                 <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,'Rejected','status')">Rejected</a>
                                                             </div>
                                                         </div>
@@ -105,115 +120,6 @@
     </div>
 </div>
 
-<!-- assigned Handler -->
-<div class="modal fade show" id="assignHandlerModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
-                </div>
-                <div class="modal-body">
-                    <form id="handlerForm">
-                        <input type="hidden" name="id" value="">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="">Assign Handler </label>
-                                    <select name="handler_id" class="form-control" id="handler_id">
-                                        <?php foreach ($handlerlist as $handler) { ?>
-                                            <option value="<?= $handler->ID ?>">
-                                                <?= $handler->name ?>
-                                            </option>
-                                        <?php } ?>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" onclick="updateChanges('handler')" class="btn btn-success">Assigned Handler</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- end  -->
-
-<!-- assigned Dispatcher -->
-<div class="modal fade show" id="assignDispatcherModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
-                </div>
-                <div class="modal-body">
-                    <form id="dispatcherForm">
-                        <input type="hidden" name="id" value="">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="">Assign Dispatcher </label>
-                                    <select name="dispatcher_id" class="form-control" id="">
-                                        <?php foreach ($dispatcherlist as $dispatcher) { ?>
-                                            <option value="<?= $dispatcher->ID ?>">
-                                                <?= $dispatcher->name ?>
-                                            </option>
-                                        <?php } ?>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" onclick="updateChanges('dispatcher')" class="btn btn-info">Assigned Dispatcher</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- end  -->
-
-<!-- update Status Model -->
-<div class="modal fade show" id="jobstatusModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
-                </div>
-                <div class="modal-body">
-                    <form id="statusForm">
-                        <input type="hidden" name="id" value="">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="">Update Status </label>
-                                    <select name="status" class="form-control" id="">
-                                        <option value="">Select Option</option>
-                                        <option value="Approved">Approved</option>
-                                        <option value="To Be Approved">To Be Approved</option>
-                                        <option value="Rejected">Rejected</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" onclick="updateChanges('jobstatus')" class="btn btn-danger">Save Changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- model end -->
 
 <!-- create job model -->
 <div class="modal fade show" id="createjobsheetModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -322,6 +228,7 @@
                                     <option value="">Select Option</option>
                                     <option value="Approved"> Approved</option>
                                     <option value="To Be Approved">To Be Approved</option>
+                                    <option value="Job to Close">Job to Close</option>
                                     <option value="Rejected">Rejected</option>
                                 </select>
                                 <span class="text-danger" id="status_error"></span>

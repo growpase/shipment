@@ -35,6 +35,15 @@
 
 <body>
 
+    <div id="loader-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 18px;">
+            <div class="spinner-border text-white" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <h3 class="text-white">Processing... Please wait</h3>
+        </div>
+    </div>
+
     <div id="preloader">
         <div class="loader"></div>
     </div>
@@ -366,8 +375,6 @@
             // Clear all validation error messages
             $(this).find('.text-danger').text('');
         });
-
-       
     </script>
 
     <?= $this->renderSection('pagescripts'); ?>

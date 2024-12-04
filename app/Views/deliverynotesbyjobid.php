@@ -111,7 +111,7 @@
                         <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="example-text-input" class="col-form-label">Delivery Note Id.</label>
-                                <input class="form-control" name="deliverynote_id" type="text" value="">
+                                <input class="form-control" name="deliverynote_id" type="text" placeholder="Delivery Notes Id.">
                                 <span class="text-danger" id="deliverynote_id_error"></span>
                             </div>
                             <div class="form-group col-md-4">
@@ -121,7 +121,7 @@
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="example-text-input" class="col-form-label">EST. Amount </label>
-                                <input type="text" name="est_amount" class="form-control" value="">
+                                <input type="text" name="est_amount" class="form-control" placeholder="Enter Amount Here">
                                 <span class="text-danger" id="est_amount_error"></span>
                             </div>
                         </div>
@@ -167,7 +167,7 @@
                         </div>
 
                         <div class="row">
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label class="col-form-label">Transport Type</label>
                                 <select name="transport_type" class="custom-select">
                                     <option value="">Select Option</option>
@@ -175,7 +175,7 @@
                                     <option value="Private Car">Private car</option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label class="col-form-label">Issue Invoice</label>
                                 <select name="is_issue_invoice" class="custom-select">
                                     <option value="">Select Option</option>
@@ -183,12 +183,20 @@
                                     <option value="NO" selected>No</option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label class="col-form-label">Invoice Issued</label>
                                 <select name="is_invoice_issued" class="custom-select">
                                     <option value="">Select Option</option>
                                     <option value="YES"> Yes</option>
                                     <option value="NO" selected>No</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label class="col-form-label">Ware House</label>
+                                <select name="warehouse" class="custom-select">
+                                    <option value="">Select Option</option>
+                                    <option value="MWH"> MWH</option>
+                                    <option value="RWH">RWH</option>
                                 </select>
                             </div>
                         </div>
@@ -211,7 +219,7 @@
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-4">
+                            <div class="col-md-4 signed_status_div">
                                 <label for="signed_status">Signed In</label>
                                 <select name="signed_status" class="form-control" id="signed_status">
                                     <option value="">Select Status</option>
@@ -221,7 +229,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-8">
+                            <div class="col-md-8 signed_status_div">
                                 <label for="signed_remark">Signed In Remark</label>
                                 <input type="text" name="signed_remark" id="signed_remark" value="" class="form-control">
                             </div>
@@ -301,6 +309,15 @@
             } else {
                 // Disable the delivery remark field if status is not 'OTHER'
                 $('#delivery_status_remark').prop('disabled', true); // Disable input field
+            }
+
+            if (status == 'DELIVERED') {
+                // Enable the delivery remark field if status is 'OTHER'
+                $('.signed_status_div').css('display', 'block'); // Enable input field
+
+            } else {
+                // Disable the delivery remark field if status is not 'OTHER'
+                $('.signed_status_div').css('display', 'none'); // Enable input field
             }
         }
 

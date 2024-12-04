@@ -61,33 +61,55 @@ class Invoices extends BaseController
             $sheetData = $spreadsheet->getActiveSheet()->toArray();
 
             if (!empty($sheetData)) {
+                // Map column headers to their positions
+                $headers = $sheetData[0]; // First row is considered as headers
+                $headerPositions = [
+                    'inv_no' => array_search('INV#', $headers),
+                    'inv_date' => array_search('DATE', $headers),
+                    'job_id' => array_search('JOB#', $headers),
+                    'add_fee' => array_search('ADD. FEE', $headers),
+                    'discount' => array_search('DISCOUNT', $headers),
+                    'net_amt' => array_search('NET AMT', $headers),
+                    'tax_vat' => array_search('TAX/VAT', $headers),
+                    'amt_with_tax' => array_search('AMT WITH TAX', $headers),
+                    'realize_cost' => array_search('REALIZED COST', $headers),
+                    'selling_cost' => array_search('SELLING COST', $headers),
+                ];
+
+                if (in_array(false, $headerPositions, true)) {
+                    return $this->response->setJSON([
+                        'status' => false,
+                        'message' => 'Error: Missing required columns in the file.',
+                    ]);
+                }
+                
                 for ($i = 1; $i < count($sheetData); $i++) {
-                    $inv_no = !empty($sheetData[$i][0]) ? $sheetData[$i][0] : '0';
-                    $job_id = !empty($sheetData[$i][3]) ? $sheetData[$i][3] : '0';
-                    $inv_date = !empty($sheetData[$i][1])
-                        ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][1])))
-                        : '0000-00-00';
-                    $add_fee = !empty($sheetData[$i][10]) ? $sheetData[$i][10] : '0';
-                    $discount = !empty($sheetData[$i][11]) ? $sheetData[$i][11] : '0';
-                    $net_amt = !empty($sheetData[$i][12]) ? $sheetData[$i][12] : '0';
-                    $tax_vat = !empty($sheetData[$i][13]) ? $sheetData[$i][13] : '0';
-                    $amt_with_tax = !empty($sheetData[$i][14]) ? $sheetData[$i][14] : '0';
-                    $realize_cost = !empty($sheetData[$i][15]) ? $sheetData[$i][15] : '0';
-                    $selling_cost = !empty($sheetData[$i][16]) ? $sheetData[$i][16] : '0';
+
+                    // update realize cost....
+                    if ($sheetData[$i][$headerPositions['job_id']] && $sheetData[$i][$headerPositions['realize_cost']] > 0) {
+                        $this->updaterealisecost($sheetData[$i][$headerPositions['job_id']], $sheetData[$i][$headerPositions['realize_cost']]);
+                    }
+
+                    // update invoice cost....
+                    if ($sheetData[$i][$headerPositions['job_id']] && $sheetData[$i][$headerPositions['selling_cost']] > 0) {
+                        $this->updateinvoiceamount($sheetData[$i][$headerPositions['job_id']], $sheetData[$i][$headerPositions['selling_cost']]);
+                    }
 
                     $data = [
-                        'job_id' => $job_id,
-                        'inv_no' => $inv_no,
-                        'inv_date' => $inv_date,
-                        'add_fee' => $add_fee,
-                        'discount' => $discount,
-                        'net_amt' => $net_amt,
-                        'tax_vat' => $tax_vat,
-                        'amt_with_tax' => $amt_with_tax,
-                        'realize_cost' => $realize_cost,
-                        'selling_cost' => $selling_cost,
+                        'job_id' => !empty($sheetData[$i][$headerPositions['job_id']]) ? $sheetData[$i][$headerPositions['job_id']] : '0',
+                        'inv_no' => !empty($sheetData[$i][$headerPositions['inv_no']]) ? $sheetData[$i][$headerPositions['inv_no']] : '0',
+                        'inv_date' => !empty($sheetData[$i][$headerPositions['inv_date']])
+                            ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][$headerPositions['inv_date']])))
+                            : '0000-00-00',
+                        'add_fee' => !empty($sheetData[$i][$headerPositions['add_fee']]) ? $sheetData[$i][$headerPositions['add_fee']] : '0',
+                        'discount' => !empty($sheetData[$i][$headerPositions['discount']]) ? $sheetData[$i][$headerPositions['discount']] : '0',
+                        'net_amt' => !empty($sheetData[$i][$headerPositions['net_amt']]) ? $sheetData[$i][$headerPositions['net_amt']] : '0',
+                        'tax_vat' => !empty($sheetData[$i][$headerPositions['tax_vat']]) ? $sheetData[$i][$headerPositions['tax_vat']] : '0',
+                        'amt_with_tax' => !empty($sheetData[$i][$headerPositions['amt_with_tax']]) ? $sheetData[$i][$headerPositions['amt_with_tax']] : '0',
+                        'realize_cost' => !empty($sheetData[$i][$headerPositions['realize_cost']]) ? $sheetData[$i][$headerPositions['realize_cost']] : '0',
+                        'selling_cost' => !empty($sheetData[$i][$headerPositions['selling_cost']]) ? $sheetData[$i][$headerPositions['selling_cost']] : '0',
                         'created_by' => $this->session->get('userId'),
-                        'create_date' => date('Y-m-d')
+                        'create_date' => date('Y-m-d'),
                     ];
                     $this->InvoiceModel->insert($data);
                 }
@@ -103,6 +125,4 @@ class Invoices extends BaseController
             }
         }
     }
-
-    
 }

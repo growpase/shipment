@@ -30,12 +30,9 @@ class Database extends Config
         'username'     => 'root',
         'password'     => 'growapse@2024',
         'database'     => 'shipment',
-
         // 'username'     => 'qhsitafp_testdb',
         // 'password'     => 'LBRUp%xPCTk#',
         // 'database'     => 'qhsitafp_testdb',
-
-
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,

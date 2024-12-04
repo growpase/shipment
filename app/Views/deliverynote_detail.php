@@ -83,7 +83,7 @@
                         </div>
 
                         <div class="row">
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label class="col-form-label">Transport Type</label>
                                 <select name="transport_type" class="custom-select">
                                     <option value="">Select Option</option>
@@ -91,7 +91,7 @@
                                     <option value="Private Car" <?= $dn_detail->transport_type == "Private Car" ? 'selected' : '' ?>>Private car</option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label class="col-form-label">Issue Invoice</label>
                                 <select name="is_issue_invoice" class="custom-select">
                                     <option value="">Select Option</option>
@@ -99,7 +99,7 @@
                                     <option value="NO" <?= $dn_detail->is_issue_invoice == "NO" ? 'selected' : '' ?>>No</option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label class="col-form-label">Invoice Issued</label>
                                 <select name="is_invoice_issued" class="custom-select">
                                     <option value="">Select Option</option>
@@ -107,6 +107,15 @@
                                     <option value="NO" <?= $dn_detail->is_invoice_issued == "NO" ? 'selected' : '' ?>>No</option>
                                 </select>
                             </div>
+                            <div class="form-group col-md-3">
+                                <label class="col-form-label">Ware House</label>
+                                <select name="warehouse" class="custom-select">
+                                    <option value="">Select Option</option>
+                                    <option value="MWH" <?= $dn_detail->warehouse == "MWH" ? 'selected' : '' ?>> MWH</option>
+                                    <option value="RWH" <?= $dn_detail->warehouse == "RWH" ? 'selected' : '' ?>>RWH</option>
+                                </select>
+                            </div>
+
                         </div>
 
                         <div class="row mb-3">
@@ -127,7 +136,7 @@
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-4">
+                            <div class="col-md-4 signed_status_div">
                                 <label for="signed_status">Signed In</label>
                                 <select name="signed_status" class="form-control" id="signed_status">
                                     <option value="">Select Status</option>
@@ -137,7 +146,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-8">
+                            <div class="col-md-8 signed_status_div">
                                 <label for="signed_remark">Signed In Remark</label>
                                 <input type="text" name="signed_remark" id="signed_remark" value="<?= $dn_detail->signed_remark ?>" class="form-control" disabled>
                             </div>
@@ -201,6 +210,16 @@
                 // Disable the delivery remark field if status is not 'OTHER'
                 $('#delivery_status_remark').prop('disabled', true); // Disable input field
             }
+
+            if (status == 'DELIVERED') {
+                // Enable the delivery remark field if status is 'OTHER'
+                $('.signed_status_div').css('display', 'block'); // Enable input field
+             
+            } else {
+                // Disable the delivery remark field if status is not 'OTHER'
+                $('.signed_status_div').css('display', 'none'); // Enable input field
+            }
+            
         }
 
         // Check the current signed status on page load and adjust the signed_remark field accordingly

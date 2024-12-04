@@ -31,7 +31,6 @@
                         </div>
                         <div class="col-md-6">
                             <button type="button" class="btn btn-info btn-sm text-white mt-4"> <i class="fa fa-search"></i> Search Record</button>
-                            <button type="button" class="btn btn-warning btn-sm text-white mt-4" data-toggle="modal" data-target="#jobsheetModal"> <i class="fa fa-upload"></i> Upload Delivery Note</button>
                         </div>
                     </div>
                     <hr>
@@ -53,12 +52,24 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($deliverynotes as $deliverynote): ?>
+                                            <?php function formatNumber($number)
+                                            {
+                                                if ($number == 0) {
+                                                    return '0.00';
+                                                }
+                                                $exploded = explode('.', $number);
+                                                $integerPart = $exploded[0];
+                                                $decimalPart = isset($exploded[1]) ? $exploded[1] : '00';
+                                                // Format the integer part
+                                                $formattedIntegerPart = preg_replace('/\B(?=(\d{2})+(?!\d))/', ',', substr($integerPart, 0, -3)) . ',' . substr($integerPart, -3);
+                                                return $formattedIntegerPart . '.' . str_pad($decimalPart, 2, '0', STR_PAD_RIGHT);
+                                            }
+                                            foreach ($deliverynotes as $deliverynote): ?>
                                                 <tr>
                                                     <td scope="row"><?= esc($deliverynote->deliverynote_id) ?></td>
                                                     <td><?= date('d-m-Y', strtotime($deliverynote->issue_date)) ?></td>
                                                     <td><?= esc($deliverynote->jobname) ?></td>
-                                                    <td><?= esc($deliverynote->est_amount) ?></td>
+                                                    <td><?= esc(formatNumber($deliverynote->est_amount)) ?></td>
                                                     <td>
                                                         <div class="btn-group">
                                                             <span type="button" class=""><?= esc($deliverynote->signed_status) ?></span>
@@ -105,7 +116,7 @@
                             </div>
                     </div>
                 <?php else: ?>
-                    <div class="card-body text-warning"> No Users Found! </div>
+                    <div class="card-body text-danger"> No Delivery Notes Found! </div>
                 <?php endif; ?>
                 </div>
             </div>

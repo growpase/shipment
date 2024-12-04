@@ -45,7 +45,7 @@
     })
 
     function submitform() {
-
+        $('#loader-overlay').fadeIn();
         var formData = new FormData($('#invoiceform')[0]);
         $.ajax({
             url: '<?= base_url() ?>import-invoices', // Your backend URL
@@ -54,6 +54,7 @@
             contentType: false, // Don't set content type header
             processData: false, // Don't process data
             success: function(response) {
+                $('#loader-overlay').fadeOut();
                 // Enable the submit button again
                 $('#form_submit').prop('disabled', false);
                 if (response.errors) {
@@ -73,20 +74,36 @@
                         }
                     }
                 } else {
-                    Swal.fire({
-                        position: "bottom-end",
-                        title: "Good job!",
-                        text: response.message,
-                        icon: "success"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.reload(); // Reloads the page when "OK" is clicked
-                        }
-                    });
+
+                    if (response.status == true) {
+                        Swal.fire({
+                            position: "bottom-end",
+                            title: "Good job!",
+                            text: response.message,
+                            icon: "success"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload(); // Reloads the page when "OK" is clicked
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            position: "bottom-end",
+                            title: "Check File ?",
+                            text: response.message,
+                            icon: "error"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload(); // Reloads the page when "OK" is clicked
+                            }
+                        });
+                    }
+
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 // Handle any server-side errors
+                $('#loader-overlay').fadeOut();
                 $('#form_submit').prop('disabled', false);
                 $('#form_submit').text('Upload File <i class="ti-upload"></i>');
                 $('#error-messages').html('<div class="alert alert-danger">There was an error with the upload. Please try again.</div>');
@@ -95,5 +112,3 @@
     }
 </script>
 <?= $this->endSection(); ?>
-
- 

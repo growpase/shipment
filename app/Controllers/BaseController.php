@@ -9,6 +9,8 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
+use App\Models\JobsheetModel;
+
 /**
  * Class BaseController
  *
@@ -27,6 +29,7 @@ abstract class BaseController extends Controller
      * @var CLIRequest|IncomingRequest
      */
     protected $request;
+    protected $JobsheetModel;
 
     /**
      * An array of helpers to be loaded automatically upon
@@ -55,5 +58,45 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
         $this->session = \Config\Services::session();
         $this->validation = \Config\Services::validation();
+    }
+
+    // update realize cost while uploading invoice sheet
+    public function updaterealisecost($job_id, $realize_cost)
+    {
+        $this->JobsheetModel = new JobsheetModel();
+        $jobData = $this->JobsheetModel->getJobById($job_id); // Replace with your method to fetch job data
+        if (!$jobData) {
+            // Log an error when the job record is not found
+            log_message('error', "Job record not found for Job ID: {$job_id} while updating realize cost.");
+            return false; // Job record not found
+        }
+
+        $id = $jobData ? $jobData->id : 0;
+        $currentCost = $jobData ? $jobData->realize_cost : 0;
+        $newCost = $currentCost + $realize_cost;
+        return $this->JobsheetModel->update($id, ['realize_cost' => $newCost]);
+    }
+
+    // update Invoice amount while uploading invoice sheet.
+    public function updateinvoiceamount($job_id, $inv_amount)
+    {
+        $this->JobsheetModel = new JobsheetModel();
+        $jobData = $this->JobsheetModel->getJobById($job_id); // Replace with your method to fetch job data
+        if (!$jobData) {
+            // Log an error when the job record is not found
+            log_message('error', "Job record not found for Job ID: {$job_id} while updating invoice amount.");
+            return false; // Job record not found
+        }
+        $id = $jobData ? $jobData->id : 0;
+        $projectCost = $jobData ? $jobData->project_cost : 0;
+        $currentInvAmount = $jobData ? $jobData->inv_amount : 0;
+        $newInvAmount = $currentInvAmount + $inv_amount;
+        $newbalanceAmount = $projectCost - $newInvAmount;
+
+        $updateArray = [
+            'invoice_amount' => $newInvAmount,
+            'balance_amount' => $newbalanceAmount
+        ];
+        return $this->JobsheetModel->update($id, $updateArray);
     }
 }

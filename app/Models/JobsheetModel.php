@@ -45,4 +45,9 @@ class JobsheetModel extends Model
             ->get()
             ->getResult();
     }
+
+    public function getJobById($jobid)
+    {
+        return $this->where('jobid', $jobid)->first();
+    }
 }

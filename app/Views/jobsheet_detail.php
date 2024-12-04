@@ -99,6 +99,7 @@
                                     <option>Select Option</option>
                                     <option value="Approved" <?= $jobdetail->status == 'Approved' ? 'selected' : '' ?>>Approved</option>
                                     <option value="To Be Approved" <?= $jobdetail->status == 'To Be Approved' ? 'selected' : '' ?>>To Be Approved</option>
+                                    <option value="Job to Close" <?= $jobdetail->status == 'Job to Close' ? 'selected' : '' ?>>Job to Close</option>
                                     <option value="Rejected" <?= $jobdetail->status == 'Rejected' ? 'selected' : '' ?>>Rejected</option>
                                 </select>
                             </div>

@@ -49,13 +49,10 @@
         $("select").on("change", function() {
             $(this).closest('.form-group').find('.text-danger').text('');
         });
-
-        
-
     })
 
     function submitform() {
-
+        $('#loader-overlay').fadeIn();
         var formData = new FormData($('#jobform')[0]);
         $.ajax({
             url: '<?= base_url() ?>import-jobsheet', // Your backend URL
@@ -64,7 +61,7 @@
             contentType: false, // Don't set content type header
             processData: false, // Don't process data
             success: function(response) {
-                
+                $('#loader-overlay').fadeOut();
                 // Enable the submit button again
                 $('#form_submit').prop('disabled', false);
                 if (response.errors) {
@@ -98,6 +95,7 @@
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 // Handle any server-side errors
+                $('#loader-overlay').fadeOut();
                 $('#form_submit').prop('disabled', false);
                 $('#form_submit').text('Upload File <i class="ti-upload"></i>');
                 $('#error-messages').html('<div class="alert alert-danger">There was an error with the upload. Please try again.</div>');
