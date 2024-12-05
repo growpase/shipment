@@ -103,7 +103,7 @@
     }
     if ($('#dataTable2').length) {
         $('#dataTable2').DataTable({
-            responsive: true
+            responsive: false
         });
     }
     if ($('#dataTable3').length) {

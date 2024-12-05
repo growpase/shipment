@@ -72,16 +72,54 @@
                         }
                     }
                 } else {
-                    Swal.fire({
-                        position: "bottom-end",
-                        title: "Good job!",
-                        text: response.message,
-                        icon: "success"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.reload(); // Reloads the page when "OK" is clicked
+                    // Swal.fire({
+                    //     position: "bottom-end",
+                    //     title: "Good job!",
+                    //     text: response.message,
+                    //     icon: "success"
+                    // }).then((result) => {
+                    //     if (result.isConfirmed) {
+                    //         location.reload(); // Reloads the page when "OK" is clicked
+                    //     }
+                    // });
+
+                    if (response.status == true) {
+                        Swal.fire({
+                            position: "bottom-end",
+                            title: "Good job!",
+                            text: response.message,
+                            icon: "success"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload(); // Reloads the page when "OK" is clicked
+                            }
+                        });
+                    } else {
+                        if (response.status == true) {
+                            Swal.fire({
+                                position: "bottom-end",
+                                title: "Good job!",
+                                text: response.message,
+                                icon: "success"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload(); // Reloads the page when "OK" is clicked
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                position: "bottom-end",
+                                title: "Ohh Snap!",
+                                text: response.message,
+                                icon: "error"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload(); // Reloads the page when "OK" is clicked
+                                }
+                            });
                         }
-                    });
+                    }
+
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {

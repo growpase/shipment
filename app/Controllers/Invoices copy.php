@@ -58,9 +58,8 @@ class Invoices extends BaseController
                 $reader = new excel();
             }
             $spreadsheet = $reader->load($tempName);
-          
             $sheetData = $spreadsheet->getActiveSheet()->toArray();
-          
+
             if (!empty($sheetData)) {
                 // Map column headers to their positions
                 $headers = $sheetData[0]; // First row is considered as headers
@@ -74,9 +73,9 @@ class Invoices extends BaseController
                     'tax_vat' => array_search('TAX/VAT', $headers),
                     'amt_with_tax' => array_search('AMT WITH TAX', $headers),
                     'realize_cost' => array_search('REALIZED COST', $headers),
-                    'selling_cost' => array_search('SELLING', $headers),
+                    'selling_cost' => array_search('SELLING COST', $headers),
                 ];
-                // echo "<pre>";print_r($headerPositions);exit;
+
                 if (in_array(false, $headerPositions, true)) {
                     return $this->response->setJSON([
                         'status' => false,
@@ -85,7 +84,7 @@ class Invoices extends BaseController
                 }
                 
                 for ($i = 1; $i < count($sheetData); $i++) {
-                   
+
                     // update realize cost....
                     if ($sheetData[$i][$headerPositions['job_id']] && $sheetData[$i][$headerPositions['realize_cost']] > 0) {
                         $this->updaterealisecost($sheetData[$i][$headerPositions['job_id']], $sheetData[$i][$headerPositions['realize_cost']]);
@@ -112,10 +111,8 @@ class Invoices extends BaseController
                         'created_by' => $this->session->get('userId'),
                         'create_date' => date('Y-m-d'),
                     ];
-                    
                     $this->InvoiceModel->insert($data);
                 }
-                
                 return $this->response->setJSON([
                     'status' => true,
                     'message' => 'File Imported Successfully.'
