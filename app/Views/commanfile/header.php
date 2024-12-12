@@ -55,7 +55,7 @@
             <div class="sidebar-header">
                 <div class="logo">
                     <a href="<?= base_url() ?>dashboard">
-                        <h4>Shipment Company</h4>
+                        <h4>Shipment Company </h4>
                     </a>
                 </div>
             </div>

@@ -110,12 +110,24 @@ class DeliveryNotesModel extends Model
     //     ],
     // ];
 
+    // public function getDeliveryNoteList()
+    // {
+    //     return $this->select('tbl_deliverynotes.*, tbl_jobsheet.jobname,tbl_jobsheet.clientname,tbl_jobsheet.manualreff')
+    //         ->join('tbl_jobsheet', 'tbl_deliverynotes.job_id = tbl_jobsheet.jobid', 'left', false) // Ensure the table name matches your database
+    //         ->orderBy('tbl_deliverynotes.id', 'DESC')
+    //         ->get()->getResult();
+    // }
+
     public function getDeliveryNoteList()
     {
-        return $this->select('tbl_deliverynotes.*, tbl_jobsheet.jobname,tbl_jobsheet.clientname,tbl_jobsheet.manualreff')
+        $builder = $this->select('tbl_deliverynotes.*, tbl_jobsheet.jobname,tbl_jobsheet.clientname,tbl_jobsheet.manualreff')
             ->join('tbl_jobsheet', 'tbl_deliverynotes.job_id = tbl_jobsheet.jobid', 'left', false) // Ensure the table name matches your database
-            ->orderBy('tbl_deliverynotes.id', 'DESC')
-            ->get()->getResult();
+            ->orderBy('tbl_deliverynotes.id', 'DESC');
+        if (session()->get('userRoleName') == 'Handler') {
+            $loggedInHandlerId = session()->get('userId'); // Assuming 'userID' holds the logged-in handler's ID
+            $builder->where('tbl_deliverynotes.handler_id', $loggedInHandlerId);
+        }
+        return $builder->get()->getResult();
     }
 
     public function getDeliveryNoteRow($dnid)
@@ -128,7 +140,7 @@ class DeliveryNotesModel extends Model
             ->getRow();
     }
 
-    
+
     public function getDeliveryNoteByJobId($jobID)
     {
         return $this->select('tbl_deliverynotes.*, tbl_jobsheet.jobname,tbl_jobsheet.clientname,tbl_jobsheet.manualreff')

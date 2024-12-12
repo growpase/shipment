@@ -43,7 +43,6 @@ class Login extends BaseController
                             "userRoleId"   => $user->role_id,
                             "userRoleName"   => $user->role_name,
                         ];
-
                         $this->session->set($sessionData);
                         $r = $this->userModel->login($this->session->userId);
                         if ($r) {

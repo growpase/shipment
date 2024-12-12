@@ -38,12 +38,16 @@ class JobsheetModel extends Model
 
     public function getJobList()
     {
-        return $this->select('tbl_jobsheet.*, dispatcher.name as dispatcher_name, handler.name as handler_name')
+        $builder = $this->select('tbl_jobsheet.*, dispatcher.name as dispatcher_name, handler.name as handler_name')
             ->join('tbl_user as dispatcher', 'dispatcher.ID = tbl_jobsheet.dispatcher_id', 'left')  // Join for dispatcher
             ->join('tbl_user as handler', 'handler.ID = tbl_jobsheet.handler_id', 'left')  // Join for handler
-            ->orderBy('tbl_jobsheet.id', 'DESC')
-            ->get()
-            ->getResult();
+            ->orderBy('tbl_jobsheet.id', 'DESC');
+        // Check if the logged-in user is a handler
+        if (session()->get('userRoleName') == 'Handler') {
+            $loggedInHandlerId = session()->get('userId'); // Assuming 'userID' holds the logged-in handler's ID
+            $builder->where('tbl_jobsheet.handler_id', $loggedInHandlerId);
+        }
+        return $builder->get()->getResult();
     }
 
     public function getJobById($jobid)
