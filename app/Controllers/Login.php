@@ -12,7 +12,7 @@ class Login extends BaseController
     public function __construct()
     {
         $this->userModel = model(UserModel::class);
-        $this->homePage  = base_url().'user';
+        $this->homePage  = base_url() . 'dashboard';
     }
 
     //Login
@@ -43,10 +43,10 @@ class Login extends BaseController
                             "userRoleId"   => $user->role_id,
                             "userRoleName"   => $user->role_name,
                         ];
+
                         $this->session->set($sessionData);
                         $r = $this->userModel->login($this->session->userId);
-                        if($r)
-                        {
+                        if ($r) {
                             return $this->response->setJSON(['status' => true, 'redirect' => $this->homePage]);
                         }
                     }

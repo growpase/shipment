@@ -14,7 +14,12 @@
                             <h5>Job Name : <?= $jobdetails->jobname ?></h5>
                         </div>
                         <div class="col-md-3">
-                            <button type="button" class="btn btn-warning btn-md text-white" data-toggle="modal" data-target="#adddeliverynotesModal"> <i class="fa fa-plus"></i> Add Delivery Note</button>
+                            <!-- <button type="button" class="btn btn-warning btn-md text-white" data-toggle="modal" data-target="#adddeliverynotesModal"> <i class="fa fa-plus"></i> Add Delivery Note</button> -->
+                            <?php if (session()->get('userRoleName') === 'Admin') : ?>
+                                <button type="button" class="btn btn-warning btn-md text-white" data-toggle="modal" data-target="#adddeliverynotesModal">
+                                    <i class="fa fa-plus"></i> Add Delivery Note
+                                </button>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <hr>
@@ -25,24 +30,136 @@
                                     <table id="dataTable2" class="text-center">
                                         <thead class="text-uppercase bg-primary">
                                             <tr class="text-white">
-                                                <th scope="col">Delivery Note</th>
+                                            <th scope="col">Delivery Note</th>
                                                 <th scope="col">Date</th>
-                                                <!-- <th scope="col">Title</th> -->
+                                                <th scope="col">Title</th>
                                                 <th scope="col">Net Amount</th>
                                                 <th scope="col">Signed</th>
                                                 <th scope="col">Issued Invoice</th>
                                                 <th scope="col">Invoice Issue</th>
+                                                <th scope="col">WareHouse</th>
+                                                <th scope="col">Transpotation Type</th>
+                                                <th scope="col">Delivery Status</th>
                                                 <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($deliverynotes as $deliverynote): ?>
+                                            <?php function formatNumber($number)
+                                            {
+                                                if ($number == 0) {
+                                                    return '0.00';
+                                                }
+                                                $exploded = explode('.', $number);
+                                                $integerPart = $exploded[0];
+                                                $decimalPart = isset($exploded[1]) ? $exploded[1] : '00';
+                                                // Format the integer part
+                                                $formattedIntegerPart = preg_replace('/\B(?=(\d{2})+(?!\d))/', ',', substr($integerPart, 0, -3)) . ',' . substr($integerPart, -3);
+                                                return $formattedIntegerPart . '.' . str_pad($decimalPart, 2, '0', STR_PAD_RIGHT);
+                                            }
+                                            foreach ($deliverynotes as $deliverynote): ?>
                                                 <tr>
                                                     <td scope="row"><?= esc($deliverynote->deliverynote_id) ?></td>
                                                     <td><?= date('d-m-Y', strtotime($deliverynote->issue_date)) ?></td>
-                                                    <!-- <td><?= esc($deliverynote->jobname) ?></td> -->
-                                                    <td><?= esc($deliverynote->est_amount) ?></td>
+                                                    <td><?= esc($deliverynote->jobname) ?></td>
+                                                    <td><?= esc(formatNumber($deliverynote->est_amount)) ?></td>
+
+
                                                     <td>
+                                                        <div class="btn-group">
+                                                            <?php if (in_array(session()->get('userRoleName'), ['Admin'])) { ?>
+                                                                <span type="button"><?= esc($deliverynote->signed_status) ?></span>
+                                                                <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <div class="dropdown-menu">
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'YES','signed_status')">Yes</a>
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'NO','signed_status')">No</a>
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'OTHER','signed_status')">Other</a>
+                                                                </div>
+                                                            <?php } else { ?>
+                                                                <span class="text-primary"><?= esc($deliverynote->signed_status) ?></span>
+                                                            <?php } ?>
+                                                        </div>
+                                                    </td>
+
+
+
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            <?php if (in_array(session()->get('userRoleName'), ['Handler', 'Admin'])) { ?>
+                                                                <span type="button"><?= esc($deliverynote->is_issue_invoice) ?></span>
+                                                                <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <div class="dropdown-menu">
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'YES','is_issue_invoice')">Yes</a>
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'NO','is_issue_invoice')">No</a>
+                                                                </div>
+                                                            <?php } else { ?>
+                                                                <span class="text-danger"><?= esc($deliverynote->is_issue_invoice) ?></span>
+                                                            <?php } ?>
+                                                        </div>
+                                                    </td>
+
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            <?php if (in_array(session()->get('userRoleName'), ['Admin'])) { ?>
+                                                                <span type="button"><?= esc($deliverynote->is_invoice_issued) ?></span>
+                                                                <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <div class="dropdown-menu">
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'YES','is_invoice_issued')">Yes</a>
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'NO','is_invoice_issued')">No</a>
+                                                                </div>
+                                                            <?php } else { ?>
+                                                                <span class="text-danger"><?= esc($deliverynote->is_invoice_issued) ?></span>
+                                                            <?php } ?>
+                                                        </div>
+                                                    </td>
+
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            <?php if (in_array(session()->get('userRoleName'), ['Dispatcher','Admin'])) { ?>
+                                                                <span type="button"><?= esc($deliverynote->warehouse) ?></span>
+                                                                <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <div class="dropdown-menu">
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'RWH','warehouse')">RWH</a>
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'MWH','warehouse')">MWH</a>
+                                                                </div>
+                                                            <?php } else { ?>
+                                                                <span class="text-info"><?= esc($deliverynote->warehouse) ?></span>
+                                                            <?php } ?>
+                                                        </div>
+                                                    </td>
+
+
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            <?php if (in_array(session()->get('userRoleName'), ['Dispatcher', 'Admin'])) { ?>
+                                                                <span type="button"><?= esc($deliverynote->transport_type) ?></span>
+                                                                <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <div class="dropdown-menu">
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'Naqel','transport_type')">Naqel</a>
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'Private Car','transport_type')">Private Car</a>
+                                                                </div>
+                                                            <?php } else { ?>
+                                                                <span class="text-success"><?= esc($deliverynote->transport_type) ?></span>
+                                                            <?php } ?>
+                                                        </div>
+                                                    </td>
+
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            <?php if (in_array(session()->get('userRoleName'), ['Dispatcher', 'Admin'])) { ?>
+                                                                <span type="button"><?= esc($deliverynote->delivery_status) ?></span>
+                                                                <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <div class="dropdown-menu">
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'DELIVERED','delivery_status')">DELIVERED</a>
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'NOT DELIVERED','delivery_status')">NOT DELIVERED</a>
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'OTHER','delivery_status')">OTHER</a>
+                                                                </div>
+                                                            <?php } else { ?>
+                                                                <span class="text-warning"><?= esc($deliverynote->delivery_status) ?></span>
+                                                            <?php } ?>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- <td>
                                                         <div class="btn-group">
                                                             <span type="button" class=""><?= esc($deliverynote->signed_status) ?></span>
                                                             <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -53,9 +170,9 @@
                                                                 <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'OTHER','signed_status')">Other</a>
                                                             </div>
                                                         </div>
-                                                    </td>
+                                                    </td> -->
 
-                                                    <td>
+                                                    <!-- <td>
                                                         <div class="btn-group">
                                                             <span type="button" class=""><?= esc($deliverynote->is_issue_invoice) ?></span>
                                                             <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -65,8 +182,10 @@
                                                                 <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'NO','is_issue_invoice')">No</a>
                                                             </div>
                                                         </div>
-                                                    </td>
-                                                    <td>
+                                                    </td> -->
+
+
+                                                    <!-- <td>
                                                         <div class="btn-group">
                                                             <span type="button" class=""><?= esc($deliverynote->is_invoice_issued) ?></span>
                                                             <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -76,10 +195,50 @@
                                                                 <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'NO','is_invoice_issued')">No</a>
                                                             </div>
                                                         </div>
+                                                    </td> -->
+
+                                                    <!-- <td>
+                                                        <div class="btn-group">
+                                                            <span type="button" class=""><?= esc($deliverynote->warehouse) ?></span>
+                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            </a>
+                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
+                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'RWH','warehouse')">RWH</a>
+                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'MWH','warehouse')">MWH</a>
+                                                            </div>
+                                                        </div>
+                                                    </td> -->
+
+                                                    <!-- <td>
+                                                        <div class="btn-group">
+                                                            <span type="button" class=""><?= esc($deliverynote->transport_type) ?></span>
+                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            </a>
+                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
+                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'Naqel','transport_type')">Naqel</a>
+                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'Private Car','transport_type')">Private Car</a>
+                                                            </div>
+                                                        </div>
+                                                    </td> -->
+
+                                                    <!-- <td>
+                                                        <div class="btn-group">
+                                                            <span type="button" class=""><?= esc($deliverynote->delivery_status) ?></span>
+                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            </a>
+                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
+                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'DELIVERED','delivery_status')">DELIVERED</a>
+                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'NOT DELIVERED','delivery_status')">NOT DELIVERED</a>
+                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'OTHER','delivery_status')">OTHER</a>
+                                                            </div>
+                                                        </div>
+                                                    </td> -->
+
+                                                    <td> <a href="<?= base_url() ?>deliverynotes-detail/<?= $deliverynote->id ?>"> <i class="fa fa-eye"></i> </a> <?php if (session()->get('userRoleName') === 'Admin') : ?>
+                                                            | <i class="fa fa-trash-o delete-icon" onclick="delete_data(<?= $deliverynote->id ?>)"></i>
+                                                        <?php endif; ?></td>
                                                     </td>
 
-                                                    <td> <a href="<?= base_url() ?>deliverynotes-detail/<?= $deliverynote->id ?>"> <i class="fa fa-eye"></i> </a> | <i class="fa fa-trash-o delete-icon" onclick="delete_data(<?= $deliverynote->id ?>)"></i></td>
-                                                    </td>
                                                 </tr>
                                             <?php endforeach ?>
                                         </tbody>
@@ -277,6 +436,37 @@
     </div>
 </div>
 
+<!-- delivery status model -->
+<div class="modal fade show" id="deliveryremarkModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+                </div>
+                <div class="modal-body">
+                    <form id="signedinform">
+                        <input type="hidden" id="deliveryid_" value="">
+                        <input type="hidden" id="delivery_status_value" value="">
+                        <div class="row">
+                            <div class="col-md-12" id="delivery_status_remark_div">
+                                <div class="form-group">
+                                    <label for="delivery_status">Delivery Status Remark </label>
+                                    <textarea class="form-control" name="delivery_status_remark" id="type_delivery_remark" placeholder="Add Status Remark" id=""></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" onclick="updateChanges($('#deliveryid_').val(), $('#delivery_status_value').val(),'delivery_status_remark')" class="btn btn-danger">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection(); ?>
 <?= $this->section('pagescripts'); ?>
 <script>
@@ -372,19 +562,66 @@
         });
     }
 
+    // function updateChanges(id, record, coloum) {
+    //     var url = '<?= base_url() ?>update-deliverynotes'; // The URL to send the AJAX request to
+    //     if (coloum == 'signed_status') {
+    //         if (record == 'OTHER') {
+    //             // Show modal to enter remark when "Other" is selected
+    //             $('#remarkModal').modal('show');
+    //             $("#deliveyid").val(id);
+    //             $("#signed_status_value").val(record);
+    //         } else {
+    //             // For "Yes" or "No", proceed with the update directly
+    //             var data = {
+    //                 id: id,
+    //                 signed_status: record
+    //             };
+    //             sendUpdateRequest(data);
+    //         }
+    //     } else {
+    //         var data = {
+    //             id: id
+    //         };
+    //         if (coloum == 'is_issue_invoice') {
+    //             data.is_issue_invoice = record;
+    //         } else if (coloum == 'is_invoice_issued') {
+    //             data.is_invoice_issued = record;
+    //         } else if (coloum == 'signed_remark') {
+    //             data.signed_remark = $('#type_signed_remark').val();
+    //             data.signed_status = record;
+    //             $('#remarkModal').modal('hide');
+    //         }
+    //         sendUpdateRequest(data);
+    //     }
+    // }
+
     function updateChanges(id, record, coloum) {
         var url = '<?= base_url() ?>update-deliverynotes'; // The URL to send the AJAX request to
         if (coloum == 'signed_status') {
             if (record == 'OTHER') {
                 // Show modal to enter remark when "Other" is selected
                 $('#remarkModal').modal('show');
-                $("#deliveyid").val(id);
+                $("#deliveryid").val(id);
                 $("#signed_status_value").val(record);
             } else {
                 // For "Yes" or "No", proceed with the update directly
                 var data = {
                     id: id,
                     signed_status: record
+                };
+                sendUpdateRequest(data);
+            }
+        } else if (coloum == 'delivery_status') {
+            if (record == 'OTHER') {
+                // Show modal to enter remark when "Other" is selected
+                $('#deliveryremarkModal').modal('show');
+                $("#deliveryid_").val(id);
+                $("#delivery_status_value").val(record);
+            } else {
+                // For "Yes" or "No", proceed with the update directly
+                var data = {
+                    id: id,
+                    delivery_status: record
                 };
                 sendUpdateRequest(data);
             }
@@ -396,10 +633,18 @@
                 data.is_issue_invoice = record;
             } else if (coloum == 'is_invoice_issued') {
                 data.is_invoice_issued = record;
+            } else if (coloum == 'warehouse') {
+                data.warehouse = record;
+            } else if (coloum == 'transport_type') {
+                data.transport_type = record;
             } else if (coloum == 'signed_remark') {
                 data.signed_remark = $('#type_signed_remark').val();
                 data.signed_status = record;
                 $('#remarkModal').modal('hide');
+            } else if (coloum == 'delivery_status_remark') {
+                data.delivery_status_remark = $('#type_delivery_remark').val();
+                data.delivery_status = record;
+                $('#deliveryremarkModal').modal('hide');
             }
             sendUpdateRequest(data);
         }

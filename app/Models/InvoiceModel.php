@@ -12,6 +12,7 @@ class InvoiceModel extends Model
     protected $allowedFields = [
         'job_id',
         'inv_no',
+        'branch',
         'delivery_id',
         'inv_date',
         'add_fee',

@@ -12,6 +12,7 @@ class DeliveryNotesModel extends Model
     protected $allowedFields = [
         'job_id',
         'handler_id',
+        'branch',
         'region',
         'warehouse',
         'deliverynote_id',

@@ -9,9 +9,11 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row mb-2">
-                        <div class="col-md-3">
-                            <button type="button" class="btn btn-success btn-md text-white" data-toggle="modal" data-target="#createjobsheetModal"> <i class="fa fa-plus mr-1"></i> Create Job</button>
-                        </div>
+                        <?php if (session()->get('userRoleName') === 'Admin') : ?>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-success btn-md text-white" data-toggle="modal" data-target="#createjobsheetModal"> <i class="fa fa-plus mr-1"></i> Create Job</button>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <hr>
                     <div class="single-table">
@@ -65,7 +67,8 @@
                                                     <td><?= esc(formatNumber($record->project_cost)) ?></td>
                                                     <td><?= esc(formatNumber($record->invoice_amount)) ?></td>
                                                     <td><?= esc(formatNumber($record->balance_amount)) ?></td>
-                                                    <td>
+
+                                                    <!-- <td>
                                                         <div class="btn-group">
                                                             <span type="button" class=""><?= esc($record->dispatcher_name) ?></span>
                                                             <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -76,33 +79,64 @@
                                                                 <?php } ?>
                                                             </div>
                                                         </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="btn-group">
-                                                            <span type="button" class=""><?= esc($record->handler_name) ?></span>
-                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            </a>
-                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <?php foreach ($handlerlist as $handler) { ?>
-                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,<?= $handler->ID ?>,'handler_id')"><?= $handler->name ?></a>
-                                                                <?php } ?>
-                                                            </div>
-                                                        </div>
-                                                    </td>
+                                                    </td> -->
 
                                                     <td>
                                                         <div class="btn-group">
-                                                            <span type="button" class=""><?= esc($record->status) ?></span>
-                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            </a>
-                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,'Approved','status')">Approved</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,'To Be Approved','status')">To Be Approved</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,'Job to Close','status')">Job to Close</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,'Rejected','status')">Rejected</a>
-                                                            </div>
+                                                            <?php if (in_array(session()->get('userRoleName'), ['Admin'])) { ?>
+                                                                <span type="button"><?= esc($record->dispatcher_name) ?></span>
+                                                                <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <div class="dropdown-menu">
+                                                                    <?php foreach ($dispatcherlist as $dispatcher) { ?>
+                                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,<?= $dispatcher->ID ?>,'dispatcher_id')">
+                                                                            <?= esc($dispatcher->name) ?>
+                                                                        </a>
+                                                                    <?php } ?>
+                                                                </div>
+                                                            <?php } else { ?>
+                                                                <span class="text-danger"><?= esc($record->dispatcher_name) ?></span>
+                                                            <?php } ?>
                                                         </div>
                                                     </td>
+
+
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            <?php if (in_array(session()->get('userRoleName'), ['Admin'])) { ?>
+                                                                <span type="button"><?= esc($record->handler_name) ?></span>
+                                                                <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <div class="dropdown-menu">
+                                                                    <?php foreach ($handlerlist as $handler) { ?>
+                                                                        <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,<?= $handler->ID ?>,'handler_id')">
+                                                                            <?= esc($handler->name) ?>
+                                                                        </a>
+                                                                    <?php } ?>
+                                                                </div>
+                                                            <?php } else { ?>
+                                                                <span class="text-danger"><?= esc($record->handler_name) ?></span>
+                                                            <?php } ?>
+                                                        </div>
+                                                    </td>
+
+
+                                                    <td>
+                                                        <div class="btn-group">
+
+                                                            <?php if (in_array(session()->get('userRoleName'), ['Admin'])) { ?>
+                                                                <span type="button"><?= esc($record->status) ?></span>
+                                                                <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <div class="dropdown-menu">
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>, 'Approved', 'status')">Approved</a>
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>, 'To Be Approved', 'status')">To Be Approved</a>
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>, 'Job to Close', 'status')">Job to Close</a>
+                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>, 'Rejected', 'status')">Rejected</a>
+                                                                </div>
+                                                            <?php } else { ?>
+                                                                <span class="text-danger"> <span type="button"><?= esc($record->status) ?></span></span>
+                                                            <?php } ?>
+                                                        </div>
+                                                    </td>
+
                                                     <td class="text-center"><a href="<?= base_url() ?>delivery-notes/<?= esc($record->jobid) ?>"><i class="ti-shopping-cart-full" title="Upload Delivery Notes"></i></a></td>
                                                 </tr>
                                             <?php endforeach ?>
@@ -452,10 +486,6 @@
         });
     }
 
-
-
-
-
     function saveRecord() {
         var formData = $('#jobform').serialize();
         var url;
@@ -472,11 +502,9 @@
                         if (response.errors.hasOwnProperty(field)) {
                             // Find the input field and display the error message
                             const inputField = $('[name="' + field + '"]');
-                            console.log(field);
                             if (inputField.length) {
                                 // Add an 'error' class to the parent container (optional for styling)
                                 inputField.closest('.form-group').addClass('has-error');
-
                                 // Display the error message in a sibling element with the class 'text-danger'
                                 inputField.siblings('.text-danger').text(response.errors[field]);
                             } else {
@@ -493,7 +521,9 @@
                             icon: "success"
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                location.reload(); // Reloads the page when "OK" is clicked
+                                // location.reload(); // Reloads the page when "OK" is clicked
+                                $('.createjobsheetModal').hide();
+                                reloadTableContent();
                             }
                         });
                     } else {
@@ -504,7 +534,9 @@
                             icon: "error"
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                location.reload(); // Reloads the page when "OK" is clicked
+                                // location.reload(); // Reloads the page when "OK" is clicked
+                                $('.createjobsheetModal').hide();
+                                reloadTableContent();
                             }
                         });
                     }

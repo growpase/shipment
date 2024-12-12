@@ -63,7 +63,7 @@
 </div>
 
 <!-- add User Modal -->
-<div class="modal fade show modalform" id="userModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade show modalform modal" id="userModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -152,7 +152,7 @@
                 </div>
                 <div class="modal-footer">
                     <!-- data-dismiss="modal" -->
-                    <button type="button" class="btn btn-secondary" onclick="hideModal()">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="button" onclick="SaveUser()" id="submit-btn" class="btn btn-danger">Save changes</button>
                 </div>
             </div>

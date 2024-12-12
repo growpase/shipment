@@ -11,7 +11,7 @@
                         <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#jobsheetModal"> <i class="fa fa-edit"> </i> Edit</button>
                     </div> -->
 
-                    <div class="d-flex justify-content-between align-items-center">
+                    <!-- <div class="d-flex justify-content-between align-items-center">
                         <button type="button" id="editBtn" class="btn btn-info btn-sm "> <i class="fa fa-edit"> </i> Edit Record</button>
                     </div>
                     <div class="row buttongrp" style="display: none;">
@@ -19,7 +19,25 @@
                             <button type="button" onclick="updateInfo()" class="btn btn-danger mb-3">Update Record</button>
                             <a href="<?= base_url() ?>job-sheet" class="btn btn-success mb-3">Cancel</a>
                         </div>
+                    </div> -->
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <?php if (session()->get('userRoleName') === 'Admin') : ?>
+                            <button type="button" id="editBtn" class="btn btn-info btn-sm">
+                                <i class="fa fa-edit"></i> Edit Record
+                            </button>
+                        <?php endif; ?>
                     </div>
+                    <div class="row buttongrp" style="display: none;">
+                        <?php if (session()->get('userRoleName') === 'Admin') : ?>
+                            <div class="form-group col-md-4">
+                                <button type="button" onclick="updateInfo()" class="btn btn-danger mb-3">Update Record</button>
+                                <a href="<?= base_url() ?>job-sheet" class="btn btn-success mb-3">Cancel</a>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+
                     <hr>
                     <form id="deliverynotesform">
                         <input type="text" name="id" hidden value="<?= $dn_detail->id ?>">
@@ -72,13 +90,22 @@
 
 
                         <div class="row">
-                            <div class="form-group col-md-6">
+                            <div class="form-group col-md-4">
                                 <label for="example-text-input" class="col-form-label">Job Name</label>
                                 <input class="form-control" readonly id="jobname" type="text" value="<?= $dn_detail->jobname ?>">
                             </div>
-                            <div class="form-group col-md-6">
+                            <div class="form-group col-md-4">
                                 <label for="example-text-input" class="col-form-label">Client Name </label>
                                 <input type="text" readonly class="form-control" id="clientname" value="<?= $dn_detail->clientname ?>">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="">Select Branch</label>
+                                <select name="branch" id="branch" class="form-control">
+                                    <option value="">Select Branch</option>
+                                    <option value="1" <?= $dn_detail->branch == '1' ? 'selected' : '' ?>>Branch 1</option>
+                                    <option value="2" <?= $dn_detail->branch == '2' ? 'selected' : '' ?>>Branch 2</option>
+                                </select>
+                                <span class="text-danger"></span>
                             </div>
                         </div>
 
@@ -214,12 +241,12 @@
             if (status == 'DELIVERED') {
                 // Enable the delivery remark field if status is 'OTHER'
                 $('.signed_status_div').css('display', 'block'); // Enable input field
-             
+
             } else {
                 // Disable the delivery remark field if status is not 'OTHER'
                 $('.signed_status_div').css('display', 'none'); // Enable input field
             }
-            
+
         }
 
         // Check the current signed status on page load and adjust the signed_remark field accordingly

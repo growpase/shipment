@@ -24,9 +24,9 @@ class User extends BaseController
             $_POST['password'] = $user->password;
             $_POST['created_at'] = date('Y-m-d');
             $_POST['is_active'] = false;
-            
+
             $userInsert = $this->UserModel->insert($_POST); // default insert function to store record without model
-            
+
             if ($userInsert > 0) {
                 return $this->response->setJSON(['status' => true, 'message' => 'User Registered Successfully']);
             } else {

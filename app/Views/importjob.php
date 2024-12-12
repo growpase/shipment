@@ -81,16 +81,98 @@
                         }
                     }
                 } else {
-                    Swal.fire({
-                        position: "bottom-end",
-                        title: "Good job!",
-                        text: response.message,
-                        icon: "success"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.reload(); // Reloads the page when "OK" is clicked
+                    if (response.status == true) {
+                        if (response.log && response.log.length > 0) {
+                            // Create a table for logs dynamically
+                            let logTable = `
+                            <table border="1" style="width: 100%; text-align: left; font-size: 14px;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 8px;">Job ID</th>
+                                        <th style="padding: 8px;">Reason</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${response.log
+                                        .map(
+                                            (log) =>
+                                                `<tr>
+                                                    <td style="padding: 8px;">${log.jobid}</td>
+                                                    <td style="padding: 8px;">${log.reason}</td>
+                                                </tr>`
+                                        )
+                                        .join("")}
+                                </tbody>
+                            </table>`;
+
+                            // Display logs in SweetAlert with print and download options
+                            Swal.fire({
+                                position: "center",
+                                title: "Import Completed with Warnings",
+                                html: `
+                                    <div style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
+                                        ${logTable}
+                                    </div>
+                                    <button class="btn btn-info" id="downloadLog" style="margin-right: 10px;">Download Logs</button>
+                                    <button class="btn btn-danger" id="printLog">Print Logs</button>
+                                `,
+                                icon: "warning",
+                                showConfirmButton: true,
+                                confirmButtonText: "Okay"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload();
+                                }
+                            });
+
+                            // Add event listener to download logs as a text file
+                            document.getElementById("downloadLog").addEventListener("click", () => {
+                                let logContent = response.log
+                                    .map((log) => `Job ID: ${log.jobid}, Reason: ${log.reason}`)
+                                    .join("\n");
+                                let blob = new Blob([logContent], {
+                                    type: "text/plain"
+                                });
+                                let link = document.createElement("a");
+                                link.href = window.URL.createObjectURL(blob);
+                                link.download = "jobsheet_logs.txt";
+                                link.click();
+                            });
+
+                            // Add event listener to print logs
+                            document.getElementById("printLog").addEventListener("click", () => {
+                                let printWindow = window.open("", "_blank");
+                                printWindow.document.write("<html><head><title>Logs</title></head><body>");
+                                printWindow.document.write("<h1>Skipped Entries Log</h1>");
+                                printWindow.document.write(logTable);
+                                printWindow.document.write("</body></html>");
+                                printWindow.document.close();
+                                printWindow.print();
+                            });
+                        } else {
+                            Swal.fire({
+                                position: "bottom-end",
+                                title: "Good job!",
+                                text: response.message,
+                                icon: "success"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload();
+                                }
+                            });
                         }
-                    });
+                    } else {
+                        Swal.fire({
+                            position: "bottom-end",
+                            title: "Ohh Snap!",
+                            text: response.message,
+                            icon: "error"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                    }
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {

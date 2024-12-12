@@ -209,52 +209,39 @@ class Jobsheet extends BaseController
                         'message' => 'Error: Missing required columns in the file.',
                     ]);
                 }
-                $log = []; // Initialize a log array for skipped entries.
 
                 for ($i = 1; $i < count($sheetData); $i++) {
-                    $jobid = $sheetData[$i][$headerPositions['jobid']];
-                    if ($jobid) {
-                        // Check for duplicate jobid
-                        $existingJob = $this->JobsheetModel->where('jobid', $jobid)->first();
-                        if ($existingJob) {
-                            // Add to log if duplicate
-                            $log[] = [
-                                'jobid' => $jobid,
-                                'reason' => 'Duplicate entry for JOB# ' . $jobid
-                            ];
-                            continue; // Skip this row
-                        }
-                    } else {
-                        if ($sheetData[$i][$headerPositions['handler_id']]) {
-                            $handlerid = $this->UserModel->getByHandlerName($sheetData[$i][$headerPositions['handler_id']]);
-                            $handler_id = !empty($handlerid) ? $handlerid->ID : '0';
-                        }
-                        $data = [
-                            'branch' => $_POST['branch'] ?? null,
-                            'jobid' => $sheetData[$i][$headerPositions['jobid']] ?? null,
-                            'jobname' => $sheetData[$i][$headerPositions['jobname']] ?? null,
-                            'job_createdate' => isset($sheetData[$i][$headerPositions['job_createdate']]) ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][$headerPositions['job_createdate']]))) : null,
-                            'manualreff' => $sheetData[$i][$headerPositions['manualreff']] ?? null,
-                            'jobtype' => $sheetData[$i][$headerPositions['jobtype']] ?? null,
-                            'clientname' => $sheetData[$i][$headerPositions['clientname']] ?? null,
-                            'handler_id' => $handler_id,
-                            'status' => $sheetData[$i][$headerPositions['status']] ?? null,
-                            'stat' => $sheetData[$i][$headerPositions['stat']] ?? null,
-                            'currency' => $sheetData[$i][$headerPositions['currency']] ?? null,
-                            'project_cost' => floatval(str_replace(',', '', $sheetData[$i][$headerPositions['project_cost']])) ?? 0,
-                            'invoice_amount' => floatval(str_replace(',', '', $sheetData[$i][$headerPositions['invoice_amount']])) ?? 0,
-                            'balance_amount' => floatval(str_replace(',', '', $sheetData[$i][$headerPositions['balance_amount']])) ?? 0,
-                            'created_by' => $this->session->get('userId'),
-                            'create_date' => date('Y-m-d'),
-                        ];
-
-                        $this->JobsheetModel->insert($data);
+                    
+                    if ($sheetData[$i][$headerPositions['handler_id']]) {
+                        $handlerid = $this->UserModel->getByHandlerName($sheetData[$i][$headerPositions['handler_id']]);
+                        $handler_id = !empty($handlerid) ? $handlerid->ID : '0';
                     }
+
+                    // apply handler ID from sheet via name....
+                    $data = [
+                        'branch' => $_POST['branch'] ?? null,
+                        'jobid' => $sheetData[$i][$headerPositions['jobid']] ?? null,
+                        'jobname' => $sheetData[$i][$headerPositions['jobname']] ?? null,
+                        'job_createdate' => isset($sheetData[$i][$headerPositions['job_createdate']]) ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][$headerPositions['job_createdate']]))) : null,
+                        'manualreff' => $sheetData[$i][$headerPositions['manualreff']] ?? null,
+                        'jobtype' => $sheetData[$i][$headerPositions['jobtype']] ?? null,
+                        'clientname' => $sheetData[$i][$headerPositions['clientname']] ?? null,
+                        'handler_id' => $handler_id,
+                        'status' => $sheetData[$i][$headerPositions['status']] ?? null,
+                        'stat' => $sheetData[$i][$headerPositions['stat']] ?? null,
+                        'currency' => $sheetData[$i][$headerPositions['currency']] ?? null,
+                        'project_cost' => floatval(str_replace(',', '', $sheetData[$i][$headerPositions['project_cost']])) ?? 0,
+                        'invoice_amount' => floatval(str_replace(',', '', $sheetData[$i][$headerPositions['invoice_amount']])) ?? 0,
+                        'balance_amount' => floatval(str_replace(',', '', $sheetData[$i][$headerPositions['balance_amount']])) ?? 0,
+                        'created_by' => $this->session->get('userId'),
+                        'create_date' => date('Y-m-d'),
+                    ];
+
+                    $this->JobsheetModel->insert($data);
                 }
                 return $this->response->setJSON([
                     'status' => true,
-                    'message' => 'File Imported Successfully.',
-                    'log' => $log
+                    'message' => 'File Imported Successfully.'
                 ]);
             } else {
                 return $this->response->setJSON([
@@ -357,35 +344,14 @@ class Jobsheet extends BaseController
                 'errors' => $errors
             ]);
         } else {
-            // $_POST['created_by'] =  $this->session->get('userId');;
-            // $_POST['create_date'] = date('Y-m-d');
-
-            // $isInsert = $this->JobsheetModel->insert($_POST);
-            // if ($isInsert > 0) {
-            //     return $this->response->setJSON(['status' => true, 'message' => 'Job Inserted Successfully']);
-            // } else {
-            //     return $this->response->setJSON(['status' => false, 'message' => 'Something Went Wrong']);
-            // }
-
-            // Get the data from the request
-            $_POST['created_by'] = $this->session->get('userId');
+            $_POST['created_by'] =  $this->session->get('userId');;
             $_POST['create_date'] = date('Y-m-d');
 
-            // Check if the job ID already exists in the database
-            $existingJob = $this->JobsheetModel->where('jobid', $_POST['jobid'])->first();
-
-            if ($existingJob) {
-                // Job ID already exists
-                return $this->response->setJSON(['status' => false, 'message' => 'Job ID already exists']);
+            $isInsert = $this->JobsheetModel->insert($_POST);
+            if ($isInsert > 0) {
+                return $this->response->setJSON(['status' => true, 'message' => 'Job Inserted Successfully']);
             } else {
-                // Proceed with inserting the new job
-                $isInsert = $this->JobsheetModel->insert($_POST);
-
-                if ($isInsert > 0) {
-                    return $this->response->setJSON(['status' => true, 'message' => 'Job Inserted Successfully']);
-                } else {
-                    return $this->response->setJSON(['status' => false, 'message' => 'Something Went Wrong']);
-                }
+                return $this->response->setJSON(['status' => false, 'message' => 'Something Went Wrong']);
             }
         }
     }

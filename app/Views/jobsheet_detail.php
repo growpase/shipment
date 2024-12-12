@@ -8,14 +8,19 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
-                        <button type="button" id="editBtn" class="btn btn-info btn-sm "> <i class="fa fa-edit"> </i> Edit Record</button>
+                        <?php if (session()->get('userRoleName') === 'Admin') : ?>
+                            <button type="button" id="editBtn" class="btn btn-info btn-sm">
+                                <i class="fa fa-edit"></i> Edit Record
+                            </button>
+                        <?php endif; ?>
                     </div>
                     <div class="row buttongrp" style="display: none;">
-                        <div class="form-group col-md-4">
-                            <button type="button" onclick="updateInfo()" class="btn btn-danger mb-3">Update Record</button>
-
-                            <a href="<?= base_url() ?>job-sheet" class="btn btn-success mb-3">Cancel</a>
-                        </div>
+                        <?php if (session()->get('userRoleName') === 'Admin') : ?>
+                            <div class="form-group col-md-4">
+                                <button type="button" onclick="updateInfo()" class="btn btn-danger mb-3">Update Record</button>
+                                <a href="<?= base_url() ?>job-sheet" class="btn btn-success mb-3">Cancel</a>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <hr>
                     <form method="POST" id="jobupdateform">
@@ -123,7 +128,7 @@
                                 <input class="form-control" type="number" name="balance_amount" value="<?= $jobdetail->balance_amount ?>">
                             </div>
                         </div>
-                        
+
                         <hr>
 
                     </form>

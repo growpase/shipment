@@ -63,20 +63,42 @@
                 <div class="menu-inner">
                     <nav>
                         <ul class="metismenu" id="menu">
-                            <!-- <li><a href="<?= base_url() ?>dashboard"><i class="ti-dashboard"></i> <span>Dashboard</span></a></li> -->
-                            <li><a href="<?= base_url() ?>user"><i class="ti-user"></i> <span>User</span></a></li>
-                            <li><a href="<?= base_url() ?>job-sheet"><i class="fa fa-sticky-note-o"></i> <span>Manage Jobs</span></a></li>
-                            <li><a href="<?= base_url() ?>manage-delivery-notes"><i class="fa fa-cart-plus"></i> <span>Manage Delivery Notes</span></a></li>
-                            <li><a href="<?= base_url() ?>invoices"><i class="ti-receipt"></i> <span>Invoices</span></a></li>
-                            <li>
-                                <a href="javascript:void(0)" aria-expanded="false"><i class="fa fa-upload"></i>
-                                    <span>Import Files</span></a>
-                                <ul class="collapse" style="height: 0px;">
-                                    <li><a href="<?= base_url() ?>import-job">Jobs</a></li>
-                                    <li><a href="<?= base_url() ?>import-deliverynotes">Delivery Notes</a></li>
-                                    <li><a href="<?= base_url() ?>import-invoices">Invoices</a></li>
-                                </ul>
-                            </li>
+                            <?php if (session()->get('userRoleName') == 'Handler') { ?>
+                                <li><a href="<?= base_url() ?>job-sheet"><i class="fa fa-sticky-note-o"></i> <span>Manage Jobs</span></a></li>
+                                <li><a href="<?= base_url() ?>manage-delivery-notes"><i class="fa fa-cart-plus"></i> <span>Manage Delivery Notes</span></a></li>
+                            <?php } else if (session()->get('userRoleName') == 'Management') { ?>
+                                <li><a href="<?= base_url() ?>job-sheet"><i class="fa fa-sticky-note-o"></i> <span>Manage Jobs</span></a></li>
+                                <li><a href="<?= base_url() ?>manage-delivery-notes"><i class="fa fa-cart-plus"></i> <span>Manage Delivery Notes</span></a></li>
+                                <li><a href="<?= base_url() ?>invoices"><i class="ti-receipt"></i> <span>Invoices</span></a></li>
+                            <?php } else if (session()->get('userRoleName') == 'Sub-Admin') { ?>
+                                <li><a href="<?= base_url() ?>job-sheet"><i class="fa fa-sticky-note-o"></i> <span>Manage Jobs</span></a></li>
+                                <li><a href="<?= base_url() ?>manage-delivery-notes"><i class="fa fa-cart-plus"></i> <span>Manage Delivery Notes</span></a></li>
+                                <li><a href="<?= base_url() ?>invoices"><i class="ti-receipt"></i> <span>Invoices</span></a></li>
+                                <li>
+                                    <a href="javascript:void(0)" aria-expanded="false"><i class="fa fa-upload"></i>
+                                        <span>Import Files</span></a>
+                                    <ul class="collapse" style="height: 0px;">
+                                        <li><a href="<?= base_url() ?>import-job">Jobs</a></li>
+                                        <li><a href="<?= base_url() ?>import-deliverynotes">Delivery Notes</a></li>
+                                        <li><a href="<?= base_url() ?>import-invoices">Invoices</a></li>
+                                    </ul>
+                                </li>
+                            <?php } else { ?>
+                                <li><a href="<?= base_url() ?>user"><i class="fa fa-sticky-note-o"></i> <span>Manage Users</span></a></li>
+                                <li><a href="<?= base_url() ?>job-sheet"><i class="fa fa-sticky-note-o"></i> <span>Manage Jobs</span></a></li>
+                                <li><a href="<?= base_url() ?>manage-delivery-notes"><i class="fa fa-cart-plus"></i> <span>Manage Delivery Notes</span></a></li>
+                                <li><a href="<?= base_url() ?>invoices"><i class="ti-receipt"></i> <span>Invoices</span></a></li>
+                                <li>
+                                    <a href="javascript:void(0)" aria-expanded="false"><i class="fa fa-upload"></i>
+                                        <span>Import Files</span></a>
+                                    <ul class="collapse" style="height: 0px;">
+                                        <li><a href="<?= base_url() ?>import-job">Jobs</a></li>
+                                        <li><a href="<?= base_url() ?>import-deliverynotes">Delivery Notes</a></li>
+                                        <li><a href="<?= base_url() ?>import-invoices">Invoices</a></li>
+                                    </ul>
+                                </li>
+                            <?php } ?>
+
                         </ul>
                     </nav>
                 </div>
@@ -127,7 +149,9 @@
                     </div>
                     <div class="col-sm-2">
                         <div class="breadcrumbs-area clearfix pull-right">
-                            <a href="<?= base_url() ?>dashboard" class="btn btn-secondary"> <i class="fa fa-backward"> </i> Back</a>
+                            <a href="javascript:history.back()" class="btn btn-secondary">
+                                <i class="fa fa-backward"></i> Back
+                            </a>
                         </div>
                     </div>
                 </div>

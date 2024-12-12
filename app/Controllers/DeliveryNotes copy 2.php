@@ -3,20 +3,17 @@
 namespace App\Controllers;
 
 use App\Models\DeliveryNotesModel;
-use App\Models\JobsheetModel;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx as excel;
 
 class DeliveryNotes extends BaseController
 {
     protected $DeliveryNotesModel;
-    protected $JobsheetModel;
     protected $validation;
 
     public function __construct()
     {
         $this->DeliveryNotesModel = new DeliveryNotesModel();
-        $this->JobsheetModel = new JobsheetModel();
     }
 
     public function importFile()
@@ -80,101 +77,20 @@ class DeliveryNotes extends BaseController
                     ]);
                 }
 
-                $log = [];
-
-                // for ($i = 1; $i < count($sheetData); $i++) {
-
-                //     $deliverynote_id = $sheetData[$i][$headerPositions['deliverynote_id']];
-
-                //     if ($deliverynote_id) {
-
-                //         $existingInvNo = $this->DeliveryNotesModel->where('deliverynote_id', $deliverynote_id)->first();
-
-                //         if ($existingInvNo) {
-                //             $log[] = [
-                //                 'deliverynoteid' => $deliverynote_id,
-                //                 'reason' => 'Duplicate entry for Delivery Number# ' . $deliverynote_id
-                //             ];
-                //             continue; // Skip this row
-                //         } else {
-
-                //             $data = [
-                //                 'branch' => $_POST['branch'],
-                //                 'deliverynote_id' => $sheetData[$i][$headerPositions['deliverynote_id']] ?? null,
-                //                 'issue_date' => isset($sheetData[$i][$headerPositions['issue_date']]) ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][$headerPositions['issue_date']]))) : null,
-                //                 'warehouse' => $sheetData[$i][$headerPositions['warehouse']] ?? null,
-                //                 'job_id' => $sheetData[$i][$headerPositions['job_id']] ?? null,
-                //                 'created_by' => $this->session->get('userId'),
-                //                 'create_date' => date('Y-m-d'),
-                //             ];
-                //             $this->DeliveryNotesModel->insert($data);
-                //         }
-                //     } else {
-                //         $log[] = [
-                //             'deliverynoteid' => $deliverynote_id,
-                //             'reason' => 'Not Found# ' . $deliverynote_id
-                //         ];
-                //         continue; // Skip this row
-                //     }
-                // }
-                // return $this->response->setJSON([
-                //     'status' => true,
-                //     'message' => 'File Imported Successfully.',
-                //     'log' => $log
-                // ]);
-
-                $log = []; // Initialize a log array for skipped entries.
-
                 for ($i = 1; $i < count($sheetData); $i++) {
-                    $deliverynote_id = $sheetData[$i][$headerPositions['deliverynote_id']];
-                    $job_id = $sheetData[$i][$headerPositions['job_id']] ?? null;
-
-                    if ($deliverynote_id) {
-                        // Check for duplicate deliverynote_id
-                        $existingInvNo = $this->DeliveryNotesModel->where('deliverynote_id', $deliverynote_id)->first();
-                        if ($existingInvNo) {
-                            $log[] = [
-                                'deliverynoteid' => $deliverynote_id,
-                                'reason' => 'Duplicate entry for Delivery Number# ' . $deliverynote_id
-                            ];
-                            continue; // Skip this row
-                        }
-
-                        // Check if job_id exists in the jobsheet table
-                        $existingJob = $this->JobsheetModel->where('jobid', $job_id)->first();
-                        if (!$existingJob) {
-                            $log[] = [
-                                'deliverynoteid' => $deliverynote_id,
-                                'reason' => 'Job ID ' . $job_id . ' Not Found.'
-                            ];
-                            continue; // Skip this row
-                        }
-
-                        // Insert the record
-                        $data = [
-                            'branch' => $_POST['branch'],
-                            'deliverynote_id' => $deliverynote_id,
-                            'issue_date' => isset($sheetData[$i][$headerPositions['issue_date']]) ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][$headerPositions['issue_date']]))) : null,
-                            'warehouse' => $sheetData[$i][$headerPositions['warehouse']] ?? null,
-                            'job_id' => $job_id,
-                            'created_by' => $this->session->get('userId'),
-                            'create_date' => date('Y-m-d'),
-                        ];
-                        $this->DeliveryNotesModel->insert($data);
-                    } else {
-                        $log[] = [
-                            'deliverynoteid' => $deliverynote_id,
-                            'reason' => 'Delivery Note ID not found or empty.'
-                        ];
-                        continue; // Skip this row
-                    }
+                    $data = [
+                        'deliverynote_id' => $sheetData[$i][$headerPositions['deliverynote_id']] ?? null,
+                        'issue_date' => isset($sheetData[$i][$headerPositions['issue_date']]) ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][$headerPositions['issue_date']]))) : null,
+                        'warehouse' => $sheetData[$i][$headerPositions['warehouse']] ?? null,
+                        'job_id' => $sheetData[$i][$headerPositions['job_id']] ?? null,
+                        'created_by' => $this->session->get('userId'),
+                        'create_date' => date('Y-m-d'),
+                    ];
+                    $this->DeliveryNotesModel->insert($data);
                 }
-
-                // Return the response with logs
                 return $this->response->setJSON([
                     'status' => true,
-                    'message' => 'File Imported Successfully.',
-                    'log' => $log
+                    'message' => 'File Imported Successfully.'
                 ]);
             } else {
                 return $this->response->setJSON([
