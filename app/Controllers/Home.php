@@ -31,6 +31,9 @@ class Home extends BaseController
     public function dashboard()
     {
         $data['pageTitle'] = 'Dashboard';
+        $data['jobcount'] = $this->JobsheetModel->getJobCount();
+        $data['dncount'] = $this->DeliveryNotesModel->getTotalDNCount();
+        $data['invcount'] = $this->InvoiceModel->getTotalInvCount();
         return view('dashboard', $data);
     }
 
@@ -45,6 +48,10 @@ class Home extends BaseController
         $data['pageTitle'] = 'Manage Jobs';
         $data['dispatcherlist'] = $this->UserModel->where('user_role', 3)->get()->getResult();
         $data['handlerlist'] = $this->UserModel->where('user_role', 2)->get()->getResult();
+
+        // search dropdown list...
+        $data['clientlist'] = $this->JobsheetModel->getClientNameList();
+        $data['manualrefflist'] = $this->JobsheetModel->getManualReffList();
         $data['Jobrecords'] = $this->JobsheetModel->getJobList();
 
         return view('jobsheet', $data);
@@ -56,7 +63,6 @@ class Home extends BaseController
         $data['dispatcherlist'] = $this->UserModel->where('user_role', 3)->get()->getResult();
         $data['handlerlist'] = $this->UserModel->where('user_role', 2)->get()->getResult();
         $data['jobdetail'] = $this->JobsheetModel->where('id', $id)->get()->getRow();
-
         return view('jobsheet_detail', $data);
     }
 
@@ -94,7 +100,9 @@ class Home extends BaseController
         $data['handlerlist'] = $this->UserModel->where('user_role', 2)->get()->getResult();
         $data['jobdetails'] = $this->JobsheetModel->where('jobid', $jobid)->get()->getRow();
         $data['deliverynotes'] = $this->DeliveryNotesModel->getDeliveryNoteByJobId($jobid);
-        // echo "<pre>";print_r($data);exit;
+        // dropdown menu...
+        $data['clientlist'] = $this->JobsheetModel->getClientNameList();
+        $data['manualrefflist'] = $this->JobsheetModel->getManualReffList();
         return view('deliverynotesbyjobid', $data);
     }
 
@@ -102,6 +110,10 @@ class Home extends BaseController
     {
         $data['pageTitle'] = 'Manage Delivery Notes';
         $data['deliverynotes'] = $this->DeliveryNotesModel->getDeliveryNoteList();
+
+        $data['manualrefflist'] = $this->JobsheetModel->getManualReffList();
+        $data['jobnamelist'] = $this->JobsheetModel->getJobNameList();
+        $data['clientlist'] = $this->JobsheetModel->getClientNameList();
         return view('manage_deliverynotes', $data);
     }
 
@@ -167,6 +179,8 @@ class Home extends BaseController
     {
         $data['pageTitle'] = 'Manage Invoices';
         $data['Invoicerecords'] = $this->InvoiceModel->getInvoiceList();
+        $data['jobnamelist'] = $this->JobsheetModel->getJobNameList();
+        $data['clientlist'] = $this->JobsheetModel->getClientNameList();
         return view('invoiceslist', $data);
     }
 }

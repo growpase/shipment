@@ -85,57 +85,11 @@ class Invoices extends BaseController
                 }
                 $log = [];
 
-                // for ($i = 1; $i < count($sheetData); $i++) {
-                //     $inv_no = $sheetData[$i][$headerPositions['inv_no']];
-                //     if ($inv_no) {
-                //         $existingInvNo = $this->InvoiceModel->where('inv_no', $inv_no)->first();
-                //         if ($existingInvNo) {
-                //             $log[] = [
-                //                 'invid' => $inv_no,
-                //                 'reason' => 'Duplicate entry for INV# ' . $inv_no
-                //             ];
-                //             continue; // Skip this row
-                //         }
-                //     } 
-
-                //     // update realize cost....
-                //     if ($sheetData[$i][$headerPositions['job_id']] && $sheetData[$i][$headerPositions['realize_cost']] > 0) {
-                //         $this->updaterealisecost($sheetData[$i][$headerPositions['job_id']], $sheetData[$i][$headerPositions['realize_cost']]);
-                //     }
-                //     // update invoice cost....
-                //     if ($sheetData[$i][$headerPositions['job_id']] && $sheetData[$i][$headerPositions['selling_cost']] > 0) {
-                //         $this->updateinvoiceamount($sheetData[$i][$headerPositions['job_id']], $sheetData[$i][$headerPositions['selling_cost']]);
-                //     }
-
-                //     $data = [
-                //         'branch' => $_POST['branch'],
-                //         'job_id' => !empty($sheetData[$i][$headerPositions['job_id']]) ? $sheetData[$i][$headerPositions['job_id']] : '0',
-                //         'inv_no' => !empty($sheetData[$i][$headerPositions['inv_no']]) ? $sheetData[$i][$headerPositions['inv_no']] : '0',
-                //         'inv_date' => !empty($sheetData[$i][$headerPositions['inv_date']])
-                //             ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][$headerPositions['inv_date']])))
-                //             : '0000-00-00',
-                //         'add_fee' => !empty($sheetData[$i][$headerPositions['add_fee']]) ? $sheetData[$i][$headerPositions['add_fee']] : '0',
-                //         'discount' => !empty($sheetData[$i][$headerPositions['discount']]) ? $sheetData[$i][$headerPositions['discount']] : '0',
-                //         'net_amt' => !empty($sheetData[$i][$headerPositions['net_amt']]) ? $sheetData[$i][$headerPositions['net_amt']] : '0',
-                //         'tax_vat' => !empty($sheetData[$i][$headerPositions['tax_vat']]) ? $sheetData[$i][$headerPositions['tax_vat']] : '0',
-                //         'amt_with_tax' => !empty($sheetData[$i][$headerPositions['amt_with_tax']]) ? $sheetData[$i][$headerPositions['amt_with_tax']] : '0',
-                //         'realize_cost' => !empty($sheetData[$i][$headerPositions['realize_cost']]) ? $sheetData[$i][$headerPositions['realize_cost']] : '0',
-                //         'selling_cost' => !empty($sheetData[$i][$headerPositions['selling_cost']]) ? $sheetData[$i][$headerPositions['selling_cost']] : '0',
-                //         'created_by' => $this->session->get('userId'),
-                //         'create_date' => date('Y-m-d'),
-                //     ];
-                //     $this->InvoiceModel->insert($data);
-                // }
-                // return $this->response->setJSON([
-                //     'status' => true,
-                //     'message' => 'File Imported Successfully.',
-                //     'log' => $log
-                // ]);
 
                 $log = []; // Initialize a log array for skipped entries.
 
                 for ($i = 1; $i < count($sheetData); $i++) {
-                    
+
                     $inv_no = $sheetData[$i][$headerPositions['inv_no']];
                     $job_id = $sheetData[$i][$headerPositions['job_id']] ?? null;
 
@@ -162,7 +116,6 @@ class Invoices extends BaseController
                             ];
                             continue; // Skip this row
                         }
-
                     }
 
                     // Update realized cost if applicable
@@ -211,5 +164,54 @@ class Invoices extends BaseController
                 ]);
             }
         }
+    }
+
+    public function InvoicesFilters()
+    {
+        // Handle Filters
+        $filters = $this->request->getPost(); // Get POST data for filters
+        $InvoiceRecords = $this->InvoiceModel->getInvoicesByFilters($filters);
+
+        $rows = '';
+        $i = 1;
+        if (!empty($InvoiceRecords)) {
+            foreach ($InvoiceRecords as $record) {
+                function formatNumber($number)
+                {
+                    if ($number == 0) {
+                        return '0.00';
+                    }
+                    $exploded = explode('.', $number);
+                    $integerPart = $exploded[0];
+                    $decimalPart = isset($exploded[1]) ? $exploded[1] : '00';
+                    // Format the integer part
+                    $formattedIntegerPart = preg_replace('/\B(?=(\d{2})+(?!\d))/', ',', substr($integerPart, 0, -3)) . ',' . substr($integerPart, -3);
+                    return $formattedIntegerPart . '.' . str_pad($decimalPart, 2, '0', STR_PAD_RIGHT);
+                }
+
+                $rows = '';
+                $rows .= '<tr>';
+                $rows .= '<th scope="row">' . $i++ . '</th>';
+                $rows .= '<td>' . esc($record->inv_no) . '</td>';
+                $rows .= '<td>' . date('d-m-Y', strtotime($record->inv_date)) . '</td>';
+                $rows .= '<td>' . esc($record->clientname) . '</td>';
+                $rows .= '<td>' . esc($record->jobname) . '</td>';
+                $rows .= '<td>' . esc(formatNumber($record->add_fee)) . '</td>';
+                $rows .= '<td>' . esc(formatNumber($record->discount)) . '</td>';
+                $rows .= '<td>' . esc(formatNumber($record->net_amt)) . '</td>';
+                $rows .= '<td>' . esc(formatNumber($record->tax_vat)) . '</td>';
+                $rows .= '<td>' . esc(formatNumber($record->amt_with_tax)) . '</td>';
+                $rows .= '<td>' . esc(formatNumber($record->realize_cost)) . '</td>';
+                $rows .= '<td>' . esc(formatNumber($record->selling_cost)) . '</td>';
+                $rows .= '</tr>';
+            }
+        } else {
+            // If no records are found, display a message
+            $rows .= '<tr>';
+            $rows .= '<td colspan="14" class="text-center text-danger">No job sheet found</td>';
+            $rows .= '</tr>';
+        }
+        // Return the rows as a JSON response
+        return $this->response->setJSON(['InvoiceRecords' => $rows]);
     }
 }

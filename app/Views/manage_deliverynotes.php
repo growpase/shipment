@@ -8,31 +8,64 @@
         <div class="col-lg-12 mt-5">
             <div class="card">
                 <div class="card-body">
-                    <div class="row mb-2">
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="">Job Id</label>
-                                <select name="" id="" class="form-control">
-                                    <option value="">Select Job Id</option>
-                                    <option value="">360</option>
-                                    <option value="">361</option>
-                                </select>
+                    <form id="filterForm" method="POST">
+                        <div class="row mb-2">
+                            <!-- Date Range -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="dateRange">Job Date</label>
+                                    <input type="text" id="" name="datetimes" class="form-control">
+                                </div>
+                            </div>
+                            <!-- Client Name -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="clientName">Job Name</label>
+                                    <select name="searchjobid" id="jobtype" class="form-control ">
+                                        <option value="">Select Job Name</option>
+                                        <?php foreach ($jobnamelist as $jobname): ?>
+                                            <option value="<?= esc($jobname->jobid) ?>"><?= esc($jobname->jobname) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
 
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="clientName">Client Name</label>
+                                    <select name="searchclientid" id="clientName" class="form-control">
+                                        <option value="">Select Client Name</option>
+                                        <?php foreach ($clientlist as $client): ?>
+                                            <option value="<?= esc($client->jobid) ?>"><?= esc($client->clientname) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Manual Reff -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="manualReff">Manual Reff.</label>
+                                    <select name="searchmanualid" id="manualReff" class="form-control">
+                                        <option value="">Select Manual Reff.</option>
+                                        <?php foreach ($manualrefflist as $manual_reff): ?>
+                                            <option value="<?= esc($manual_reff->jobid) ?>"><?= esc($manual_reff->manualreff) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Button Group -->
+                            <div class="col-md-3">
+                                <div class="btn-group w-100" role="group" aria-label="Button group example">
+                                    <button type="button" id="searchBtn" class="btn btn-info btn-sm text-white">
+                                        <i class="fa fa-search"></i> Search Record
+                                    </button>
+                                    <button type="button" id="resetBtn" class="btn btn-dark btn-sm text-white">
+                                        <i class="fa fa-refresh"></i> Reset
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="">Job Name</label>
-                                <select name="" id="" class="form-control">
-                                    <option value="">Select Job Name</option>
-                                    <option value="">AKIRA BACK</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <button type="button" class="btn btn-info btn-sm text-white mt-4"> <i class="fa fa-search"></i> Search Record</button>
-                        </div>
-                    </div>
+                    </form>
                     <hr>
                     <div class="single-table dntable">
                         <?php if (!empty($deliverynotes) and is_array($deliverynotes)): ?>
@@ -44,16 +77,15 @@
                                                 <th scope="col">Delivery Note</th>
                                                 <th scope="col">Date</th>
                                                 <th scope="col">Title</th>
+                                                <th scope="col">Client Name</th>
+                                                <th scope="col">Manual Reff.</th>
                                                 <th scope="col">Net Amount</th>
                                                 <th scope="col">Signed</th>
                                                 <th scope="col">Issued Invoice</th>
                                                 <th scope="col">Invoice Issue</th>
-
                                                 <th scope="col">WareHouse</th>
                                                 <th scope="col">Transpotation Type</th>
                                                 <th scope="col">Delivery Status</th>
-
-
                                                 <th scope="col">Action</th>
                                             </tr>
                                         </thead>
@@ -75,9 +107,9 @@
                                                     <td scope="row"><?= esc($deliverynote->deliverynote_id) ?></td>
                                                     <td><?= date('d-m-Y', strtotime($deliverynote->issue_date)) ?></td>
                                                     <td><?= esc($deliverynote->jobname) ?></td>
+                                                    <td><?= esc($deliverynote->clientname) ?></td>
+                                                    <td><?= esc($deliverynote->manualreff) ?></td>
                                                     <td><?= esc(formatNumber($deliverynote->est_amount)) ?></td>
-
-
                                                     <td>
                                                         <div class="btn-group">
                                                             <?php if (in_array(session()->get('userRoleName'), ['Admin'])) { ?>
@@ -93,9 +125,6 @@
                                                             <?php } ?>
                                                         </div>
                                                     </td>
-
-
-
                                                     <td>
                                                         <div class="btn-group">
                                                             <?php if (in_array(session()->get('userRoleName'), ['Handler', 'Admin'])) { ?>
@@ -110,7 +139,6 @@
                                                             <?php } ?>
                                                         </div>
                                                     </td>
-
                                                     <td>
                                                         <div class="btn-group">
                                                             <?php if (in_array(session()->get('userRoleName'), ['Admin'])) { ?>
@@ -125,10 +153,9 @@
                                                             <?php } ?>
                                                         </div>
                                                     </td>
-
                                                     <td>
                                                         <div class="btn-group">
-                                                            <?php if (in_array(session()->get('userRoleName'), ['Dispatcher','Admin'])) { ?>
+                                                            <?php if (in_array(session()->get('userRoleName'), ['Dispatcher', 'Admin'])) { ?>
                                                                 <span type="button"><?= esc($deliverynote->warehouse) ?></span>
                                                                 <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
                                                                 <div class="dropdown-menu">
@@ -172,81 +199,6 @@
                                                             <?php } ?>
                                                         </div>
                                                     </td>
-
-                                                    <!-- <td>
-                                                        <div class="btn-group">
-                                                            <span type="button" class=""><?= esc($deliverynote->signed_status) ?></span>
-                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            </a>
-                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'YES','signed_status')">Yes</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'NO','signed_status')">No</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'OTHER','signed_status')">Other</a>
-                                                            </div>
-                                                        </div>
-                                                    </td> -->
-
-                                                    <!-- <td>
-                                                        <div class="btn-group">
-                                                            <span type="button" class=""><?= esc($deliverynote->is_issue_invoice) ?></span>
-                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            </a>
-                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'YES','is_issue_invoice')">Yes</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'NO','is_issue_invoice')">No</a>
-                                                            </div>
-                                                        </div>
-                                                    </td> -->
-
-
-                                                    <!-- <td>
-                                                        <div class="btn-group">
-                                                            <span type="button" class=""><?= esc($deliverynote->is_invoice_issued) ?></span>
-                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            </a>
-                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'YES','is_invoice_issued')">Yes</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'NO','is_invoice_issued')">No</a>
-                                                            </div>
-                                                        </div>
-                                                    </td> -->
-
-                                                    <!-- <td>
-                                                        <div class="btn-group">
-                                                            <span type="button" class=""><?= esc($deliverynote->warehouse) ?></span>
-                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            </a>
-                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'RWH','warehouse')">RWH</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'MWH','warehouse')">MWH</a>
-                                                            </div>
-                                                        </div>
-                                                    </td> -->
-
-                                                    <!-- <td>
-                                                        <div class="btn-group">
-                                                            <span type="button" class=""><?= esc($deliverynote->transport_type) ?></span>
-                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            </a>
-                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'Naqel','transport_type')">Naqel</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'Private Car','transport_type')">Private Car</a>
-                                                            </div>
-                                                        </div>
-                                                    </td> -->
-
-                                                    <!-- <td>
-                                                        <div class="btn-group">
-                                                            <span type="button" class=""><?= esc($deliverynote->delivery_status) ?></span>
-                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            </a>
-                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'DELIVERED','delivery_status')">DELIVERED</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'NOT DELIVERED','delivery_status')">NOT DELIVERED</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $deliverynote->id ?>,'OTHER','delivery_status')">OTHER</a>
-                                                            </div>
-                                                        </div>
-                                                    </td> -->
 
                                                     <td> <a href="<?= base_url() ?>deliverynotes-detail/<?= $deliverynote->id ?>"> <i class="fa fa-eye"></i> </a> <?php if (session()->get('userRoleName') === 'Admin') : ?>
                                                             | <i class="fa fa-trash-o delete-icon" onclick="delete_data(<?= $deliverynote->id ?>)"></i>
@@ -345,6 +297,39 @@
         $("select").on("change", function() {
             $(this).closest('.form-gp').find('.error-text').text('');
         });
+
+        $('input[name="datetimes"]').daterangepicker({
+            timePicker: false,
+            startDate: moment().startOf('hour'),
+            endDate: moment().startOf('hour').add(32, 'hour'),
+            locale: {
+                format: 'YYYY-MM-DD'
+            }
+        });
+
+        $('#searchBtn').click(function() {
+            $('#dataTable2 tbody').html('');
+            // Serialize form data
+            var filters = $('#filterForm').serialize();
+            $.ajax({
+                url: '<?= base_url('deliverynotes-filter') ?>',
+                type: 'POST',
+                data: filters,
+                success: function(response) {
+                    $('#dataTable2 tbody').html(response.DNRecords);
+                    initializeDataTable();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error occurred:', error);
+                }
+            });
+        });
+
+    });
+
+    // Handle Reset Button Click
+    $('#resetBtn').click(function() {
+        window.location.href = '<?= base_url('manage-delivery-notes') ?>';
     });
 
     // Function to reload the table content and reinitialize the DataTable
@@ -362,14 +347,13 @@
         if ($.fn.dataTable.isDataTable('#dataTable2')) {
             $('#dataTable2').DataTable().destroy();
         }
-
         // Reinitialize DataTable
         $('#dataTable2').DataTable({
             "paging": true, // Enable pagination
             "searching": true, // Enable search
-            "ordering": true, // Enable column sorting
-            "info": true, // Display info about the number of records
-            "lengthChange": true, // Enable the option to change the number of records per page
+            "ordering": false, // Enable column sorting
+            "info": false, // Display info about the number of records
+            "lengthChange": false, // Enable the option to change the number of records per page
             "responsive": false // Make the table responsive
         });
     }

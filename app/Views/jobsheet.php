@@ -8,13 +8,70 @@
         <div class="col-lg-12 mt-2">
             <div class="card">
                 <div class="card-body">
-                    <div class="row mb-2">
-                        <?php if (session()->get('userRoleName') === 'Admin') : ?>
+                    <form id="filterForm" method="POST">
+                        <div class="row mb-2">
+                            <!-- Date Range -->
                             <div class="col-md-3">
-                                <button type="button" class="btn btn-success btn-md text-white" data-toggle="modal" data-target="#createjobsheetModal"> <i class="fa fa-plus mr-1"></i> Create Job</button>
+                                <div class="form-group">
+                                    <label for="dateRange">Job Date</label>
+                                    <input type="text" id="" name="datetimes" class="form-control" placeholder="d">
+                                </div>
                             </div>
-                        <?php endif; ?>
-                    </div>
+                            <!-- Client Name -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="clientName">Client Name</label>
+                                    <select name="clientname" id="clientName" class="form-control">
+                                        <option value="">Select Client Name</option>
+                                        <?php foreach ($clientlist as $client): ?>
+                                            <option value="<?= esc($client->clientname) ?>"><?= esc($client->clientname) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Manual Reff -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="manualReff">Manual Reff.</label>
+                                    <select name="manualreff" id="manualReff" class="form-control">
+                                        <option value="">Select Manual Reff.</option>
+                                        <?php foreach ($manualrefflist as $manual_reff): ?>
+                                            <option value="<?= esc($manual_reff->manualreff) ?>"><?= esc($manual_reff->manualreff) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="clientName">Job Type</label>
+                                    <select name="searchjobtype" id="jobtype" class="form-control ">
+                                        <option value="">Select Job Type</option>
+                                        <?php foreach (JOBTYPES as $jobtype): ?>
+                                            <option value="<?= $jobtype ?>"><?= ucfirst($jobtype) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Button Group -->
+                            <div class="col-md-3">
+                                <div class="btn-group w-100" role="group" aria-label="Button group example">
+                                    <button type="button" id="searchBtn" class="btn btn-info btn-sm text-white">
+                                        <i class="fa fa-search"></i> Search
+                                    </button>
+                                    <button type="button" id="resetBtn" class="btn btn-dark btn-sm text-white">
+                                        <i class="fa fa-refresh"></i> Reset
+                                    </button>
+
+                                    <?php if (session()->get('userRoleName') === 'Admin') : ?>
+                                        <button type="button" class="btn btn-success btn-md text-white" data-toggle="modal" data-target="#createjobsheetModal">
+                                            <i class="fa fa-plus mr-1"></i> Create Job
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                     <hr>
                     <div class="single-table">
                         <?php if (!empty($Jobrecords) and is_array($Jobrecords)): ?>
@@ -50,7 +107,6 @@
                                                 $exploded = explode('.', $number);
                                                 $integerPart = $exploded[0];
                                                 $decimalPart = isset($exploded[1]) ? $exploded[1] : '00';
-                                                // Format the integer part
                                                 $formattedIntegerPart = preg_replace('/\B(?=(\d{2})+(?!\d))/', ',', substr($integerPart, 0, -3)) . ',' . substr($integerPart, -3);
                                                 return $formattedIntegerPart . '.' . str_pad($decimalPart, 2, '0', STR_PAD_RIGHT);
                                             }
@@ -67,19 +123,6 @@
                                                     <td><?= esc(formatNumber($record->project_cost)) ?></td>
                                                     <td><?= esc(formatNumber($record->invoice_amount)) ?></td>
                                                     <td><?= esc(formatNumber($record->balance_amount)) ?></td>
-
-                                                    <!-- <td>
-                                                        <div class="btn-group">
-                                                            <span type="button" class=""><?= esc($record->dispatcher_name) ?></span>
-                                                            <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            </a>
-                                                            <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(72px, 43px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <?php foreach ($dispatcherlist as $dispatcher) { ?>
-                                                                    <a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(<?= $record->id ?>,<?= $dispatcher->ID ?>,'dispatcher_id')"><?= $dispatcher->name ?></a>
-                                                                <?php } ?>
-                                                            </div>
-                                                        </div>
-                                                    </td> -->
 
                                                     <td>
                                                         <div class="btn-group">
@@ -153,7 +196,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- create job model -->
 <div class="modal fade show" id="createjobsheetModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -301,9 +343,9 @@
 </div>
 <!-- end model -->
 
-
 <?= $this->endSection(); ?>
 <?= $this->section('pagescripts'); ?>
+
 <script>
     $(document).ready(function() {
         // For input fields
@@ -314,6 +356,16 @@
         // For select elements
         $("select").on("change", function() {
             $(this).closest('.form-group').find('.text-danger').text('');
+        });
+
+        $('input[name="datetimes"]').daterangepicker({
+            timePicker: false,
+            startDate: moment().startOf('hour'),
+            endDate: moment().startOf('hour').add(32, 'hour'),
+            autoUpdateInput: true, // Prevents the input field from being auto-filled
+            locale: {
+                format: 'YYYY-MM-DD'
+            }
         });
 
         // Function to calculate balance
@@ -331,84 +383,30 @@
             calculateBalance();
         });
 
+        // Handle Search Button Click
+        $('#searchBtn').click(function() {
+            $('#dataTable2 tbody').html('');
+            // Serialize form data
+            var filters = $('#filterForm').serialize();
+            $.ajax({
+                url: '<?= base_url('jobsheet-filter') ?>',
+                type: 'POST',
+                data: filters,
+                success: function(response) {
+                    $('#dataTable2 tbody').html(response.Jobrecords);
+                    initializeDataTable();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error occurred:', error);
+                }
+            });
+        });
     });
 
-    // function assigned_user(jobid, userType) {
-    //     save_method = 'update';
-    //     var link = "<?php echo base_url() ?>edit-jobsheet/" + jobid;
-    //     // Ajax to load data from the server
-    //     $.ajax({
-    //         url: link,
-    //         type: "GET",
-    //         dataType: "JSON",
-    //         success: function(data) {
-
-    //             $('[name="id"]').val(data.id);
-    //             if (userType == 'dispatcher') {
-    //                 $('[name="dispatcher_id"]').val(data.dispatcher_id);
-    //                 $('#assignDispatcherModal').modal('show');
-    //                 $('#assignDispatcherModal .modal-title').text('Edit Dispatcher Info');
-    //             } else if (userType == 'handler') {
-    //                 $('[name="handler_id"]').val(data.handler_id);
-    //                 $('#assignHandlerModal').modal('show');
-    //                 $('#assignHandlerModal .modal-title').text('Edit Handler Info');
-    //             } else if (userType == 'jobstatus') {
-    //                 $('[name="status"]').val(data.status);
-    //                 $('#jobstatusModal').modal('show');
-    //                 $('#jobstatusModal .modal-title').text('Edit Status');
-    //             }
-    //         },
-    //         error: function(jqXHR, textStatus, errorThrown) {
-    //             alert(errorThrown);
-    //         }
-    //     });
-    // }
-
-    // function updateChanges(userType) {
-    //     var formData;
-    //     var url = '<?= base_url() ?>update-jobsheet';
-    //     if (userType == 'dispatcher') {
-    //         formData = $('#dispatcherForm').serialize();
-    //     } else if (userType == 'handler') {
-    //         formData = $('#handlerForm').serialize();
-    //     } else if (userType == 'jobstatus') {
-    //         formData = $('#statusForm').serialize();
-    //     }
-
-    //     $.ajax({
-    //         url: url,
-    //         type: "POST",
-    //         data: formData, // Send serialized form data
-    //         dataType: "json",
-    //         success: function(response) {
-    //             if (response.status == true) {
-    //                 Swal.fire({
-    //                     position: "bottom-end",
-    //                     title: "Good job!",
-    //                     text: response.message,
-    //                     icon: "success"
-    //                 }).then((result) => {
-    //                     if (result.isConfirmed) {
-    //                         location.reload(); // Reload the page on confirmation
-    //                     }
-    //                 });
-    //             } else {
-    //                 Swal.fire({
-    //                     position: "bottom-end",
-    //                     text: response.message,
-    //                     icon: "error" // Changed to 'error' for incorrect status
-    //                 }).then((result) => {
-    //                     if (result.isConfirmed) {
-    //                         location.reload(); // Reload the page on confirmation
-    //                     }
-    //                 });
-    //             }
-    //         },
-    //         error: function(jqXHR, textStatus, errorThrown) {
-    //             console.log('AJAX request failed:', textStatus, errorThrown);
-    //         }
-    //     });
-    // }
+    // Handle Reset Button Click
+    $('#resetBtn').click(function() {
+        window.location.href = '<?= base_url('job-sheet') ?>';
+    });
 
     // Function to reload the table content and reinitialize the DataTable
     function reloadTableContent() {
@@ -425,14 +423,13 @@
         if ($.fn.dataTable.isDataTable('#dataTable2')) {
             $('#dataTable2').DataTable().destroy();
         }
-
         // Reinitialize DataTable
         $('#dataTable2').DataTable({
             "paging": true, // Enable pagination
             "searching": true, // Enable search
-            "ordering": true, // Enable column sorting
-            "info": true, // Display info about the number of records
-            "lengthChange": true, // Enable the option to change the number of records per page
+            "ordering": false, // Enable column sorting
+            "info": false, // Display info about the number of records
+            "lengthChange": false, // Enable the option to change the number of records per page
             "responsive": false // Make the table responsive
         });
     }

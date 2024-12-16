@@ -263,38 +263,126 @@ class DeliveryNotes extends BaseController
         }
     }
 
-    public function stuff()
+    
+
+    public function DeliveryNotesbyFilters()
     {
+        // Handle Filters
+        $filters = $this->request->getPost(); // Get POST data for filters
+        $DNRecords = $this->DeliveryNotesModel->getDeliveryNotesByFilters($filters);
+        $rows = '';
+        if (!empty($DNRecords)) {
+            foreach ($DNRecords as $deliverynote) {
+                $rows .= '<tr>';
+                $rows .= '<td scope="row">' . esc($deliverynote->deliverynote_id) . '</td>';
+                $rows .= '<td>' . date('d-m-Y', strtotime($deliverynote->issue_date)) . '</td>';
+                $rows .= '<td>' . esc($deliverynote->jobname) . '</td>';
+                $rows .= '<td>' . esc($deliverynote->clientname) . '</td>';
+                $rows .= '<td>' . esc($deliverynote->manualreff) . '</td>';
+                $rows .= '<td>' . esc(number_format($deliverynote->est_amount, 2)) . '</td>';
 
-        // for ($i = 1; $i < count($sheetData); $i++) {
+                // Signed Status Dropdown
+                $rows .= '<td><div class="btn-group">';
+                if (in_array(session()->get('userRoleName'), ['Admin'])) {
+                    $rows .= '<span type="button">' . esc($deliverynote->signed_status) . '</span>';
+                    $rows .= '<a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>';
+                    $rows .= '<div class="dropdown-menu">';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'YES\',\'signed_status\')">Yes</a>';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'NO\',\'signed_status\')">No</a>';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'OTHER\',\'signed_status\')">Other</a>';
+                    $rows .= '</div>';
+                } else {
+                    $rows .= '<span class="text-primary">' . esc($deliverynote->signed_status) . '</span>';
+                }
+                $rows .= '</div></td>';
 
-        //     $job_id = !empty($sheetData[$i][8]) ? $sheetData[$i][8] : '0';
-        //     $deliverynote_id = !empty($sheetData[$i][0]) ? $sheetData[$i][0] : '0';
+                // Issue Invoice Dropdown
+                $rows .= '<td><div class="btn-group">';
+                if (in_array(session()->get('userRoleName'), ['Handler', 'Admin'])) {
+                    $rows .= '<span type="button">' . esc($deliverynote->is_issue_invoice) . '</span>';
+                    $rows .= '<a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>';
+                    $rows .= '<div class="dropdown-menu">';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'YES\',\'is_issue_invoice\')">Yes</a>';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'NO\',\'is_issue_invoice\')">No</a>';
+                    $rows .= '</div>';
+                } else {
+                    $rows .= '<span class="text-danger">' . esc($deliverynote->is_issue_invoice) . '</span>';
+                }
+                $rows .= '</div></td>';
 
-        //     $issue_date = !empty($sheetData[$i][1])
-        //         ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][1])))
-        //         : '0000-00-00';
+                // Invoice Issued Dropdown
+                $rows .= '<td><div class="btn-group">';
+                if (in_array(session()->get('userRoleName'), ['Admin'])) {
+                    $rows .= '<span type="button">' . esc($deliverynote->is_invoice_issued) . '</span>';
+                    $rows .= '<a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>';
+                    $rows .= '<div class="dropdown-menu">';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'YES\',\'is_invoice_issued\')">Yes</a>';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'NO\',\'is_invoice_issued\')">No</a>';
+                    $rows .= '</div>';
+                } else {
+                    $rows .= '<span class="text-danger">' . esc($deliverynote->is_invoice_issued) . '</span>';
+                }
+                $rows .= '</div></td>';
 
-        //     $warehouse = !empty($sheetData[$i][5]) ? $sheetData[$i][5] : '0';
+                // Warehouse Dropdown
+                $rows .= '<td><div class="btn-group">';
+                if (in_array(session()->get('userRoleName'), ['Dispatcher', 'Admin'])) {
+                    $rows .= '<span type="button">' . esc($deliverynote->warehouse) . '</span>';
+                    $rows .= '<a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>';
+                    $rows .= '<div class="dropdown-menu">';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'RWH\',\'warehouse\')">RWH</a>';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'MWH\',\'warehouse\')">MWH</a>';
+                    $rows .= '</div>';
+                } else {
+                    $rows .= '<span class="text-info">' . esc($deliverynote->warehouse) . '</span>';
+                }
+                $rows .= '</div></td>';
 
-        //     $data = [
-        //         'job_id' => $job_id,
-        //         'deliverynote_id' => $deliverynote_id,
-        //         'issue_date' => $issue_date,
-        //         'warehouse' => $warehouse,
-        //         'created_by' => $this->session->get('userId'),
-        //         'created_date' => date('Y-m-d')
-        //     ];
-        //     $this->DeliveryNotesModel->insert($data);
-        // }
+                // Transport Type Dropdown
+                $rows .= '<td><div class="btn-group">';
+                if (in_array(session()->get('userRoleName'), ['Dispatcher', 'Admin'])) {
+                    $rows .= '<span type="button">' . esc($deliverynote->transport_type) . '</span>';
+                    $rows .= '<a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>';
+                    $rows .= '<div class="dropdown-menu">';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'Naqel\',\'transport_type\')">Naqel</a>';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'Private Car\',\'transport_type\')">Private Car</a>';
+                    $rows .= '</div>';
+                } else {
+                    $rows .= '<span class="text-success">' . esc($deliverynote->transport_type) . '</span>';
+                }
+                $rows .= '</div></td>';
 
-        // $data = [
-        //     'job_id' => $job_id,
-        //     'deliverynote_id' => $deliverynote_id,
-        //     'issue_date' => $issue_date,
-        //     'warehouse' => $warehouse,
-        //     'created_by' => $this->session->get('userId'),
-        //     'created_date' => date('Y-m-d')
-        // ];
+                // Delivery Status Dropdown
+                $rows .= '<td><div class="btn-group">';
+                if (in_array(session()->get('userRoleName'), ['Dispatcher', 'Admin'])) {
+                    $rows .= '<span type="button">' . esc($deliverynote->delivery_status) . '</span>';
+                    $rows .= '<a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>';
+                    $rows .= '<div class="dropdown-menu">';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'DELIVERED\',\'delivery_status\')">DELIVERED</a>';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'NOT DELIVERED\',\'delivery_status\')">NOT DELIVERED</a>';
+                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $deliverynote->id . ',\'OTHER\',\'delivery_status\')">OTHER</a>';
+                    $rows .= '</div>';
+                } else {
+                    $rows .= '<span class="text-warning">' . esc($deliverynote->delivery_status) . '</span>';
+                }
+                $rows .= '</div></td>';
+
+                // Actions (View and Delete)
+                $rows .= '<td><a href="' . base_url('deliverynotes-detail/' . $deliverynote->id) . '"><i class="fa fa-eye"></i></a>';
+                if (session()->get('userRoleName') === 'Admin') {
+                    $rows .= ' | <i class="fa fa-trash-o delete-icon" onclick="delete_data(' . $deliverynote->id . ')"></i>';
+                }
+                $rows .= '</td>';
+
+                $rows .= '</tr>';
+            }
+        } else {
+            // If no records are found, display a message
+            $rows .= '<tr>';
+            $rows .= '<td colspan="14" class="text-center text-danger">No job sheet found</td>';
+            $rows .= '</tr>';
+        }
+        // Return the rows as a JSON response
+        return $this->response->setJSON(['DNRecords' => $rows]);
     }
 }

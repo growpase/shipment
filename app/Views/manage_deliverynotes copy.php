@@ -8,38 +8,61 @@
         <div class="col-lg-12 mt-5">
             <div class="card">
                 <div class="card-body">
-                    <div class="row mb-2">
-                        <div class="col-md-9">
-                            <h5>Job ID : <?= $jobdetails->jobid ?></h5>
-                            <h5>Job Name : <?= $jobdetails->jobname ?></h5>
-                        </div>
-                    </div>
-                   
-                    <!-- <div class="row mb-2">
-                       
-                        <div class="col-md-4">
+                <div class="row mb-2">
+                        <!-- Date Range -->
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label for="dateRange">Job Date</label>
-                                <input type="text" name="datetimes" class="form-control">
+                                <input type="text" id="" name="datetimes" class="form-control">
                             </div>
                         </div>
-                      
+                        <!-- Client Name -->
+
                         <div class="col-md-3">
-                            <div class="btn-group btn-sm w-100 mt-4" role="group" aria-label="Button group example">
-                                <button type="button" id="searchBtn" class="btn btn-info btn-sm text-white">
-                                    <i class="fa fa-search"></i> Search
-                                </button>
-                                <button type="button" id="resetBtn" class="btn btn-dark btn-sm text-white">
-                                    <i class="fa fa-refresh"></i> Reset
-                                </button>
-                                <?php if (session()->get('userRoleName') === 'Admin') : ?>
-                                    <button type="button" class="btn btn-warning btn-md text-white" data-toggle="modal" data-target="#adddeliverynotesModal">
-                                        <i class="fa fa-plus"></i> Add Delivery Note
-                                    </button>
-                                <?php endif; ?>
+                            <div class="form-group">
+                                <label for="clientName">Job Name</label>
+                                <select name="searchjobtype" id="jobtype" class="form-control ">
+                                    <option value="">Select Job Type</option>
+                                    <?php foreach ($jobnamelist as $jobname): ?>
+                                        <option value="<?= esc($jobname->id) ?>"><?= esc($jobname->jobname) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                         </div>
-                    </div> -->
+
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="clientName">Client Name</label>
+                                <select name="clientname" id="clientName" class="form-control">
+                                    <option value="">Select Client Name</option>
+                                    <?php foreach ($clientlist as $client): ?>
+                                        <option value="<?= esc($client->id) ?>"><?= esc($client->clientname) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Manual Reff -->
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="manualReff">Manual Reff.</label>
+                                <select name="manualreff" id="manualReff" class="form-control">
+                                    <option value="">Select Manual Reff.</option>
+                                    <?php foreach ($manualrefflist as $manual_reff): ?>
+                                        <option value="<?= esc($manual_reff->id) ?>"><?= esc($manual_reff->manualreff) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Button Group -->
+                        <div class="col-md-3">
+                            <div class="btn-group w-100" role="group" aria-label="Button group example">
+                                <button type="button" class="btn btn-info btn-sm text-white">
+                                    <i class="fa fa-search"></i> Search Record
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <hr>
                     <div class="single-table dntable">
                         <?php if (!empty($deliverynotes) and is_array($deliverynotes)): ?>
@@ -81,8 +104,8 @@
                                                     <td scope="row"><?= esc($deliverynote->deliverynote_id) ?></td>
                                                     <td><?= date('d-m-Y', strtotime($deliverynote->issue_date)) ?></td>
                                                     <td><?= esc($deliverynote->jobname) ?></td>
-                                                    <td><?= esc($deliverynote->clientname) ?></td>
-                                                    <td><?= esc($deliverynote->manualreff) ?></td>
+                                                    <td><?= esc($deliverynote->clientname)?></td>
+                                                    <td><?= esc($deliverynote->manualreff)?></td>
                                                     <td><?= esc(formatNumber($deliverynote->est_amount)) ?></td>
                                                     <td>
                                                         <div class="btn-group">
@@ -99,7 +122,6 @@
                                                             <?php } ?>
                                                         </div>
                                                     </td>
-
                                                     <td>
                                                         <div class="btn-group">
                                                             <?php if (in_array(session()->get('userRoleName'), ['Handler', 'Admin'])) { ?>
@@ -114,7 +136,6 @@
                                                             <?php } ?>
                                                         </div>
                                                     </td>
-
                                                     <td>
                                                         <div class="btn-group">
                                                             <?php if (in_array(session()->get('userRoleName'), ['Admin'])) { ?>
@@ -129,10 +150,9 @@
                                                             <?php } ?>
                                                         </div>
                                                     </td>
-
                                                     <td>
                                                         <div class="btn-group">
-                                                            <?php if (in_array(session()->get('userRoleName'), ['Dispatcher', 'Admin'])) { ?>
+                                                            <?php if (in_array(session()->get('userRoleName'), ['Dispatcher','Admin'])) { ?>
                                                                 <span type="button"><?= esc($deliverynote->warehouse) ?></span>
                                                                 <a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
                                                                 <div class="dropdown-menu">
@@ -202,6 +222,7 @@
                                                         </div>
                                                     </td> -->
 
+
                                                     <!-- <td>
                                                         <div class="btn-group">
                                                             <span type="button" class=""><?= esc($deliverynote->is_invoice_issued) ?></span>
@@ -256,6 +277,7 @@
                                                         <?php endif; ?></td>
                                                     </td>
 
+
                                                 </tr>
                                             <?php endforeach ?>
                                         </tbody>
@@ -264,7 +286,7 @@
                             </div>
                     </div>
                 <?php else: ?>
-                    <div class="card-body text-warning"> No Users Found! </div>
+                    <div class="card-body text-danger"> No Delivery Notes Found! </div>
                 <?php endif; ?>
                 </div>
             </div>
@@ -272,157 +294,7 @@
     </div>
 </div>
 
-
-
-<!-- invoice issue model -->
-<div class="modal fade show" id="adddeliverynotesModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
-                </div>
-                <div class="modal-body">
-                    <form id="deliverynotesform">
-                        <div class="row">
-                            <div class="form-group col-md-4">
-                                <label for="example-text-input" class="col-form-label">Delivery Note Id.</label>
-                                <input class="form-control" name="deliverynote_id" type="text" placeholder="Delivery Notes Id.">
-                                <span class="text-danger" id="deliverynote_id_error"></span>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="example-text-input" class="col-form-label">Date </label>
-                                <input type="date" name="issue_date" class="form-control" value="">
-                                <span class="text-danger" id="issue_date_error"></span>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="example-text-input" class="col-form-label">EST. Amount </label>
-                                <input type="text" name="est_amount" class="form-control" placeholder="Enter Amount Here">
-                                <span class="text-danger" id="est_amount_error"></span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group col-md-6">
-                                <label for="example-text-input" class="col-form-label">Job List</label>
-                                <input type="text" name="job_id" class="form-control" readonly value="<?= $jobdetails->jobid ?>" id="">
-                            </div>
-
-                            <div class="form-group col-md-3">
-                                <label for="example-text-input" class="col-form-label">Handler</label>
-                                <select name="handler_id" class="form-control select2" id="handler_id">
-                                    <option value="">Select Handler Here</option>
-                                    <?php foreach ($handlerlist as $handler) { ?>
-                                        <option value="<?= $handler->ID ?>"><?= $handler->name ?></option>
-                                    <?php } ?>
-                                </select>
-                                <span class="text-danger" id="handler_id_error"></span>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label for="example-text-input" class="col-form-label">Region </label>
-                                <select name="region" class="form-control">
-                                    <option value="">Select Region</option>
-                                    <?php foreach (REGIONS as $region): ?>
-                                        <option value="<?= $region ?>"><?= ucfirst($region) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <span class="text-danger" id="region_error"></span>
-                            </div>
-                        </div>
-
-
-                        <div class="row">
-                            <div class="form-group col-md-6">
-                                <label for="example-text-input" class="col-form-label">Job Name</label>
-                                <input class="form-control" readonly type="text" placeholder="<?= $jobdetails->jobname ?>">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="example-text-input" class="col-form-label">Client Name </label>
-                                <input type="text" readonly class="form-control" placeholder="<?= $jobdetails->clientname ?>">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group col-md-3">
-                                <label class="col-form-label">Transport Type</label>
-                                <select name="transport_type" class="custom-select">
-                                    <option value="">Select Option</option>
-                                    <option value="Naqel"> Naqel</option>
-                                    <option value="Private Car">Private car</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label class="col-form-label">Issue Invoice</label>
-                                <select name="is_issue_invoice" class="custom-select">
-                                    <option value="">Select Option</option>
-                                    <option value="YES"> Yes</option>
-                                    <option value="NO" selected>No</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label class="col-form-label">Invoice Issued</label>
-                                <select name="is_invoice_issued" class="custom-select">
-                                    <option value="">Select Option</option>
-                                    <option value="YES"> Yes</option>
-                                    <option value="NO" selected>No</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label class="col-form-label">Ware House</label>
-                                <select name="warehouse" class="custom-select">
-                                    <option value="">Select Option</option>
-                                    <option value="MWH"> MWH</option>
-                                    <option value="RWH">RWH</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label for="delivery_status">Delivery Status</label>
-                                <select name="delivery_status" class="form-control" id="delivery_status">
-                                    <option value="">Select Status</option>
-                                    <option value="DELIVERED">DELIVERED</option>
-                                    <option value="NOT DELIVERED" selected>NOT DELIVERED</option>
-                                    <option value="OTHER">Other</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-8">
-                                <label for="delivery_status_remark">Delivery Remark</label>
-                                <input type="text" name="delivery_status_remark" id="delivery_status_remark" value="" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4 signed_status_div">
-                                <label for="signed_status">Signed In</label>
-                                <select name="signed_status" class="form-control" id="signed_status">
-                                    <option value="">Select Status</option>
-                                    <option value="YES">Yes</option>
-                                    <option value="NO" selected>No</option>
-                                    <option value="OTHER">Other</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-8 signed_status_div">
-                                <label for="signed_remark">Signed In Remark</label>
-                                <input type="text" name="signed_remark" id="signed_remark" value="" class="form-control">
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" onclick="SaveDeliveryNote()" class="btn btn-danger">Save Changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!--  remarkModal -->
+<!-- signed in status model -->
 <div class="modal fade show" id="remarkModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -432,7 +304,7 @@
                 </div>
                 <div class="modal-body">
                     <form id="signedinform">
-                        <input type="hidden" id="deliveyid" value="">
+                        <input type="hidden" id="deliveryid" value="">
                         <input type="hidden" id="signed_status_value" value="">
                         <div class="row">
                             <div class="col-md-12" id="signed_remark_div">
@@ -446,7 +318,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" onclick="updateChanges($('#deliveyid').val(), $('#signed_status_value').val(),'signed_remark')" class="btn btn-danger">Save Changes</button>
+                    <button type="button" onclick="updateChanges($('#deliveryid').val(), $('#signed_status_value').val(),'signed_remark')" class="btn btn-danger">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -491,73 +363,12 @@
     $(document).ready(function() {
         // For input fields
         $("input").on("change", function() {
-            $(this).closest('.form-group ').find('.error-text').text('');
+            $(this).closest('.form-gp').find('.error-text').text('');
         });
         // For select elements
         $("select").on("change", function() {
-            $(this).closest('.form-group ').find('.error-text').text('');
+            $(this).closest('.form-gp').find('.error-text').text('');
         });
-
-        $('input[name="datetimes"]').daterangepicker({
-            timePicker: false,
-            startDate: moment().startOf('hour'),
-            endDate: moment().startOf('hour').add(32, 'hour'),
-            locale: {
-                format: 'YYYY-MM-DD'
-            }
-        });
-        // Check the current delivery status on page load and adjust the input field accordingly
-        var deliveryStatus = $('#delivery_status').val();
-        toggleDeliveryRemarkField(deliveryStatus); // Call function on page load
-
-        // Listen to changes in the delivery status select dropdown
-        $('#delivery_status').change(function() {
-            var selectedStatus = $(this).val();
-            toggleDeliveryRemarkField(selectedStatus); // Adjust the input field when changed
-        });
-
-        // Function to enable/disable the delivery remark field based on selected delivery status
-        function toggleDeliveryRemarkField(status) {
-            if (status == 'OTHER') {
-                // Enable the delivery remark field if status is 'OTHER'
-                $('#delivery_status_remark').prop('disabled', false); // Enable input field
-            } else {
-                // Disable the delivery remark field if status is not 'OTHER'
-                $('#delivery_status_remark').prop('disabled', true); // Disable input field
-            }
-
-            if (status == 'DELIVERED') {
-                // Enable the delivery remark field if status is 'OTHER'
-                $('.signed_status_div').css('display', 'block'); // Enable input field
-
-            } else {
-                // Disable the delivery remark field if status is not 'OTHER'
-                $('.signed_status_div').css('display', 'none'); // Enable input field
-            }
-        }
-
-        // Check the current signed status on page load and adjust the signed_remark field accordingly
-        var signedStatus = $('#signed_status').val();
-        toggleSignedRemarkField(signedStatus); // Call function on page load
-
-        // Listen to changes in the signed_status select dropdown
-        $('#signed_status').change(function() {
-            var selectedStatus = $(this).val();
-            toggleSignedRemarkField(selectedStatus); // Adjust the signed_remark field when changed
-        });
-
-        // Function to enable/disable the signed remark field based on selected signed status
-        function toggleSignedRemarkField(status) {
-            if (status == 'OTHER') {
-                // Enable the signed remark field if status is 'OTHER'
-                $('#signed_remark').prop('disabled', false); // Enable input field
-            } else {
-                // Disable the signed remark field if status is not 'OTHER'
-                $('#signed_remark').prop('disabled', true); // Disable input field
-            }
-        }
-
-
     });
 
     // Function to reload the table content and reinitialize the DataTable
@@ -586,39 +397,6 @@
             "responsive": false // Make the table responsive
         });
     }
-
-    // function updateChanges(id, record, coloum) {
-    //     var url = '<?= base_url() ?>update-deliverynotes'; // The URL to send the AJAX request to
-    //     if (coloum == 'signed_status') {
-    //         if (record == 'OTHER') {
-    //             // Show modal to enter remark when "Other" is selected
-    //             $('#remarkModal').modal('show');
-    //             $("#deliveyid").val(id);
-    //             $("#signed_status_value").val(record);
-    //         } else {
-    //             // For "Yes" or "No", proceed with the update directly
-    //             var data = {
-    //                 id: id,
-    //                 signed_status: record
-    //             };
-    //             sendUpdateRequest(data);
-    //         }
-    //     } else {
-    //         var data = {
-    //             id: id
-    //         };
-    //         if (coloum == 'is_issue_invoice') {
-    //             data.is_issue_invoice = record;
-    //         } else if (coloum == 'is_invoice_issued') {
-    //             data.is_invoice_issued = record;
-    //         } else if (coloum == 'signed_remark') {
-    //             data.signed_remark = $('#type_signed_remark').val();
-    //             data.signed_status = record;
-    //             $('#remarkModal').modal('hide');
-    //         }
-    //         sendUpdateRequest(data);
-    //     }
-    // }
 
     function updateChanges(id, record, coloum) {
         var url = '<?= base_url() ?>update-deliverynotes'; // The URL to send the AJAX request to
@@ -742,58 +520,6 @@
                 });
             }
         })
-    }
-
-    // save delivery notes.....
-    function SaveDeliveryNote() {
-        var form = $('#deliverynotesform');
-        var formData = form.serialize();
-        var url;
-        url = '<?= base_url() ?>insert-deliverynote';
-        $.ajax({
-            url: url,
-            type: "POST",
-            data: formData, // Send serialized form data
-            dataType: "json",
-            success: function(response) {
-
-                if (response.errors) {
-                    // Loop through each error and display it next to the respective field
-                    for (const field in response.errors) {
-                        if (response.errors.hasOwnProperty(field)) {
-                            // Find the input field and display the error message
-                            const inputField = $('[name="' + field + '"]');
-
-                            if (inputField.length) {
-                                // Add an 'error' class to the parent container (optional for styling)
-                                inputField.closest('.form-group ').addClass('has-error');
-
-                                // Display the error message in a sibling element with the class 'text-danger'
-                                inputField.siblings('.text-danger').text(response.errors[field]);
-                            } else {
-                                console.error('Input field not found for:', field);
-                            }
-                        }
-                    }
-                } else {
-
-                    Swal.fire({
-                        position: "bottom-end",
-                        title: "Good job!",
-                        text: response.message,
-                        icon: "success"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.reload(); // Reloads the page when "OK" is clicked
-                        }
-                    });
-                }
-                // location.reload()
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log('AJAX request failed:', textStatus, errorThrown);
-            }
-        });
     }
 </script>
 <?= $this->endSection(); ?>

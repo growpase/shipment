@@ -22,6 +22,120 @@ class Jobsheet extends BaseController
         $this->UserModel = new UserModel();
     }
 
+    // bk- 9-12-24...
+    // public function importFile()
+    // {
+    //     $rules = [
+    //         'branch' => [
+    //             'label' => 'Branch',
+    //             'rules' => 'required'
+    //         ],
+    //         'import_file' => [
+    //             'label' => 'File',
+    //             'rules' => 'uploaded[import_file]|mime_in[import_file,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain]|ext_in[import_file,xls,xlsx,csv]'
+    //         ]
+    //     ];
+
+    //     // Custom validation messages
+    //     $customMessages = [
+    //         'branch' => [
+    //             'required' => 'Please select a branch.'  // Custom message for branch field
+    //         ],
+    //         'import_file' => [
+    //             'uploaded' => 'Please upload a file.',
+    //             'mime_in'  => 'Only Excel (.xls, .xlsx) or CSV files are allowed.',
+    //             'ext_in'   => 'The file extension must be .xls, .xlsx, or .csv.'
+    //         ]
+    //     ];
+
+    //     $this->validation->setRules($rules, $customMessages);
+
+    //     // Validate the form data
+    //     if (!$this->validation->withRequest($this->request)->run()) {
+    //         // If validation fails, return the error messages as JSON
+    //         $errors = $this->validation->getErrors();
+    //         return $this->response->setJSON([
+    //             'status' => false,
+    //             'errors' => $errors
+    //         ]);
+    //     } else {
+    //         $filename =  $this->request->getFile('import_file');
+    //         $name = $filename->getName();
+    //         $tempName = $filename->getTempName();
+    //         $arr_file = explode(".", $name);
+    //         $extension = end($arr_file);
+    //         if ('csv' == $extension) {
+    //             $reader = new Csv();
+    //         } else {
+    //             $reader = new excel();
+    //         }
+    //         $spreadsheet = $reader->load($tempName);
+    //         $sheetData = $spreadsheet->getActiveSheet()->toArray();
+
+    //         if (!empty($sheetData)) {
+    //             $headers = $sheetData[0]; // First row is considered as headers
+    //             $headerPositions = [
+    //                 'jobid' => array_search('JOB#', $headers),
+    //                 'jobname' => array_search('PROJECT NAME', $headers),
+    //                 'job_createdate' => array_search('DATE CREATION', $headers),
+    //                 'manualreff' => array_search('MANUAL REF#', $headers),
+    //                 'jobtype' => array_search('JOB TYPE', $headers),
+    //                 'clientname' => array_search('CLIENT NAME', $headers),
+    //                 'handler_id' => array_search('HANDLER', $headers),
+    //                 'status' => array_search('STATUS', $headers),
+    //                 'stat' => array_search('STAT', $headers),
+    //                 'currency' => array_search('CURRENCY', $headers),
+    //                 'project_cost' => array_search('PROJECT VALUE', $headers),
+    //                 'invoice_amount' => array_search('TOTAL INV ISSUED AMOUNT', $headers),
+    //                 'balance_amount' => array_search('BALANCE', $headers),
+    //             ];
+
+    //             if (in_array(false, $headerPositions, true)) {
+    //                 return $this->response->setJSON([
+    //                     'status' => false,
+    //                     'message' => 'Error: Missing required columns in the file.',
+    //                 ]);
+    //             }
+
+    //             for ($i = 1; $i < count($sheetData); $i++) {
+    //                 if ($sheetData[$i][$headerPositions['handler_id']]) {
+    //                     $handlerid = $this->UserModel->getByHandlerName($sheetData[$i][$headerPositions['handler_id']]);
+    //                     $handler_id = !empty($handlerid) ? $handlerid->ID : '0';
+    //                 }
+    //                 // apply handler ID from sheet via name....
+    //                 $data = [
+    //                     'branch' => $_POST['branch'] ?? null,
+    //                     'jobid' => $sheetData[$i][$headerPositions['jobid']] ?? null,
+    //                     'jobname' => $sheetData[$i][$headerPositions['jobname']] ?? null,
+    //                     'job_createdate' => isset($sheetData[$i][$headerPositions['job_createdate']]) ? date('Y-m-d', strtotime(str_replace('/', '-',$sheetData[$i][$headerPositions['job_createdate']]))) : null,
+    //                     'manualreff' => $sheetData[$i][$headerPositions['manualreff']] ?? null,
+    //                     'jobtype' => $sheetData[$i][$headerPositions['jobtype']] ?? null,
+    //                     'clientname' => $sheetData[$i][$headerPositions['clientname']] ?? null,
+    //                     'handler_id' => $handler_id,
+    //                     'status' => $sheetData[$i][$headerPositions['status']] ?? null,
+    //                     'stat' => $sheetData[$i][$headerPositions['stat']] ?? null,
+    //                     'currency' => $sheetData[$i][$headerPositions['currency']] ?? null,
+    //                     'project_cost' => floatval(str_replace(',', '', $sheetData[$i][$headerPositions['project_cost']])) ?? 0,
+    //                     'invoice_amount' => floatval(str_replace(',', '', $sheetData[$i][$headerPositions['invoice_amount']])) ?? 0,
+    //                     'balance_amount' => floatval(str_replace(',', '', $sheetData[$i][$headerPositions['balance_amount']])) ?? 0,
+    //                     'created_by' => $this->session->get('userId'),
+    //                     'create_date' => date('Y-m-d'),
+    //                 ];
+    //                 $this->JobsheetModel->insert($data);
+    //             }
+    //             return $this->response->setJSON([
+    //                 'status' => true,
+    //                 'message' => 'File Imported Successfully.'
+    //             ]);
+    //         } else {
+    //             return $this->response->setJSON([
+    //                 'status' => false,
+    //                 'message' => 'Something Went Wrong.'
+    //             ]);
+    //         }
+    //     }
+    // }
+
     public function importFile()
     {
         $rules = [
@@ -298,104 +412,79 @@ class Jobsheet extends BaseController
         }
     }
 
-
-
     public function JobFilters()
     {
         // Handle Filters
         $filters = $this->request->getPost(); // Get POST data for filters
+        
         $Jobrecords = $this->JobsheetModel->getJobRecordsByFilters($filters);
-
-        $dispatcherlist = $this->UserModel->where('user_role', 3)->get()->getResult();
-        $handlerlist = $this->UserModel->where('user_role', 2)->get()->getResult();
-
         $rows = '';
-        if (!empty($Jobrecords)) {
-            $rows = '';
-
-            foreach ($Jobrecords as $record) {
-
-                function formatNumber($number)
-                {
-                    if ($number == 0) {
-                        return '0.00';
-                    }
-                    $exploded = explode('.', $number);
-                    $integerPart = $exploded[0];
-                    $decimalPart = isset($exploded[1]) ? $exploded[1] : '00';
-                    // Format the integer part
-                    $formattedIntegerPart = preg_replace('/\B(?=(\d{2})+(?!\d))/', ',', substr($integerPart, 0, -3)) . ',' . substr($integerPart, -3);
-                    return $formattedIntegerPart . '.' . str_pad($decimalPart, 2, '0', STR_PAD_RIGHT);
-                }
-
-
-                $rows .= '<tr>';
-                $rows .= '<th scope="row">' . esc($record->jobid) . '</th>';
-                $rows .= '<td>' . date('d-m-Y', strtotime($record->job_createdate)) . '</td>';
-                $rows .= '<td><a href="' . base_url('jobsheet-detail/' . esc($record->id)) . '">' . esc($record->jobname) . '</a></td>';
-                $rows .= '<td>' . esc($record->jobtype) . '</td>';
-                $rows .= '<td>' . esc($record->clientname) . '</td>';
-                $rows .= '<td>' . esc($record->manualreff) . '</td>';
-                $rows .= '<td>' . esc(formatNumber($record->realize_cost)) . '</td>';
-                $rows .= '<td>' . esc(formatNumber($record->project_cost)) . '</td>';
-                $rows .= '<td>' . esc(formatNumber($record->invoice_amount)) . '</td>';
-                $rows .= '<td>' . esc(formatNumber($record->balance_amount)) . '</td>';
-                $rows .= '<td><div class="btn-group">';
-
-                if (in_array(session()->get('userRoleName'), ['Admin'])) {
-                    $rows .= '<span type="button">' . esc($record->dispatcher_name) . '</span>';
-                    $rows .= '<a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>';
-                    $rows .= '<div class="dropdown-menu">';
-                    foreach ($dispatcherlist as $dispatcher) {
-                        $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $record->id . ',' . $dispatcher->ID . ',\'dispatcher_id\')">' . esc($dispatcher->name) . '</a>';
-                    }
-                    $rows .= '</div>';
-                } else {
-                    $rows .= '<span class="text-danger">' . esc($record->dispatcher_name) . '</span>';
-                }
-
-                $rows .= '</div></td>';
-                $rows .= '<td><div class="btn-group">';
-
-                if (in_array(session()->get('userRoleName'), ['Admin'])) {
-                    $rows .= '<span type="button">' . esc($record->handler_name) . '</span>';
-                    $rows .= '<a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>';
-                    $rows .= '<div class="dropdown-menu">';
-                    foreach ($handlerlist as $handler) {
-                        $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $record->id . ',' . $handler->ID . ',\'handler_id\')">' . esc($handler->name) . '</a>';
-                    }
-                    $rows .= '</div>';
-                } else {
-                    $rows .= '<span class="text-danger">' . esc($record->handler_name) . '</span>';
-                }
-
-                $rows .= '</div></td>';
-                $rows .= '<td><div class="btn-group">';
-
-                if (in_array(session()->get('userRoleName'), ['Admin'])) {
-                    $rows .= '<span type="button">' . esc($record->status) . '</span>';
-                    $rows .= '<a class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>';
-                    $rows .= '<div class="dropdown-menu">';
-                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $record->id . ', \'Approved\', \'status\')">Approved</a>';
-                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $record->id . ', \'To Be Approved\', \'status\')">To Be Approved</a>';
-                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $record->id . ', \'Job to Close\', \'status\')">Job to Close</a>';
-                    $rows .= '<a class="dropdown-item" href="javascript:void(0)" onclick="updateChanges(' . $record->id . ', \'Rejected\', \'status\')">Rejected</a>';
-                    $rows .= '</div>';
-                } else {
-                    $rows .= '<span class="text-danger">' . esc($record->status) . '</span>';
-                }
-
-                $rows .= '</div></td>';
-                $rows .= '<td class="text-center"><a href="' . base_url('delivery-notes/' . esc($record->jobid)) . '"><i class="ti-shopping-cart-full" title="Upload Delivery Notes"></i></a></td>';
-                $rows .= '</tr>';
-            }
-        } else {
-            // If no records are found, display a message
+        foreach ($Jobrecords as $record) {
             $rows .= '<tr>';
-            $rows .= '<td colspan="14" class="text-center text-danger">No job sheet found</td>';
+            $rows .= '<td>' . $record->jobid . '</td>';
+            $rows .= '<td>' . date('d-m-Y', strtotime($record->job_createdate)) . '</td>';
+            $rows .= '<td><a href="' . base_url('jobsheet-detail/' . $record->id) . '">' . $record->jobname . '</a></td>';
+            $rows .= '<td>' . $record->jobtype . '</td>';
+            $rows .= '<td>' . $record->clientname . '</td>';
+            $rows .= '<td>' . $record->manualreff . '</td>';
+            $rows .= '<td>' . number_format($record->realize_cost, 2) . '</td>';
+            $rows .= '<td>' . number_format($record->project_cost, 2) . '</td>';
+            $rows .= '<td>' . number_format($record->invoice_amount, 2) . '</td>';
+            $rows .= '<td>' . number_format($record->balance_amount, 2) . '</td>';
+            $rows .= '<td>' . $record->dispatcher_name . '</td>';
+            $rows .= '<td>' . $record->handler_name . '</td>';
+            $rows .= '<td>' . $record->status . '</td>';
+            $rows .= '<td><a href="' . base_url('delivery-notes/' . $record->jobid) . '"><i class="ti-shopping-cart-full" title="Upload Delivery Notes"></i></a></td>';
             $rows .= '</tr>';
         }
         // Return the rows as a JSON response
         return $this->response->setJSON(['Jobrecords' => $rows]);
+    }
+
+    public function stuff()
+    {
+        //     $user_name = !empty($sheetData[$i][7]) ? $sheetData[$i][7] : '0'; 
+        //     // apply handler ID from sheet via name....
+        //     $handlerid = $this->UserModel->getByHandlerName($user_name);
+
+        //     $handler_id = !empty($handlerid) ? $handlerid->ID : '0';
+        //     $branch = $_POST['branch'];
+        //     $jobid = !empty($sheetData[$i][2]) ? $sheetData[$i][0] : '0';
+        //     $jobname = !empty($sheetData[$i][2]) ? $sheetData[$i][2] : '0';
+
+        //     $job_createdate = !empty($sheetData[$i][3])
+        //         ? date('Y-m-d', strtotime(str_replace('/', '-', $sheetData[$i][3])))
+        //         : '0000-00-00';
+
+        //     $manualreff = !empty($sheetData[$i][4]) ? $sheetData[$i][4] : '0';
+        //     $jobtype = !empty($sheetData[$i][5]) ? $sheetData[$i][5] : '0';
+        //     $clientname = !empty($sheetData[$i][6]) ? $sheetData[$i][6] : '0';
+        //     $stat = !empty($sheetData[$i][18]) ? $sheetData[$i][18] : '0';
+        //     $currency = !empty($sheetData[$i][19]) ? $sheetData[$i][19] : '0';
+        //     $status = !empty($sheetData[$i][13]) ? $sheetData[$i][13] : '0';
+        //     $project_cost = !empty($sheetData[$i][22]) ? floatval(str_replace(',', '', $sheetData[$i][22])) : 0;
+        //     $invoice_amount = !empty($sheetData[$i][22]) ? floatval(str_replace(',', '', $sheetData[$i][23])) : 0;
+        //     $balance_amount = !empty($sheetData[$i][24]) ? floatval(str_replace(',', '', $sheetData[$i][24])) : 0;
+
+        //     $data = [
+        //         'branch' => $branch,
+        //         'jobid' => $jobid,
+        //         'jobname' => $jobname,
+        //         'job_createdate' => $job_createdate,
+        //         'manualreff' => $manualreff,
+        //         'jobtype' => $jobtype,
+        //         'clientname' => $clientname,
+        //         'stat' => $stat,
+        //         'currency' => $currency,
+        //         'handler_id' => $handler_id,
+        //         'status' => $status,
+        //         'project_cost' => $project_cost,
+        //         'invoice_amount' => $invoice_amount,
+        //         'balance_amount' => $balance_amount,
+        //         'created_by' => $this->session->get('userId'),
+        //         'create_date' => date('Y-m-d')
+        //     ];
+
+        //     $this->JobsheetModel->insert($data);
     }
 }

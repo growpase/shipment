@@ -50,4 +50,9 @@ $routes->post('insert-deliverynote','DeliveryNotes::insertDeliveryNote');
 // invoices....
 $routes->post('import-invoices','Invoices::importFile');
 
+
+// filters
+$routes->post('jobsheet-filter','Jobsheet::JobFilters');
+$routes->post('deliverynotes-filter','DeliveryNotes::DeliveryNotesbyFilters');
+$routes->post('invoice-filter','Invoices::InvoicesFilters');
  
